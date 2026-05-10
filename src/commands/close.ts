@@ -90,7 +90,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 			if (config.github_enabled && config.github_sync_on_write !== false) {
 				const { ghClose, detectGitHubRepo, ghIsAvailable } = await import("../github.ts");
 				if (await ghIsAvailable()) {
-					const repo = config.github_repo ?? await detectGitHubRepo(process.cwd());
+					const repo = config.github_repo ?? (await detectGitHubRepo(process.cwd()));
 					if (repo) {
 						for (const id of closed) {
 							const issue = issues.find((i) => i.id === id);

@@ -23,8 +23,8 @@ let tmpDir: string;
 let seedsDir: string;
 
 beforeEach(async () => {
-	tmpDir = await mkdtemp(join(tmpdir(), "seeds-store-test-"));
-	seedsDir = join(tmpDir, ".seeds");
+	tmpDir = await mkdtemp(join(tmpdir(), "suji-store-test-"));
+	seedsDir = join(tmpDir, ".suji");
 	await Bun.write(join(seedsDir, ".gitignore"), "*.lock\n");
 });
 

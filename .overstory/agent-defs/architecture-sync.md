@@ -63,7 +63,7 @@ ov mail send --to <parent> --subject "Error: <topic>" \
      --body "Synced architecture.md for <missionSlug>. Records written: <N>. Domains: <list>. Superseded records flagged: <ids or none>." \
      --type worker_done --agent $OVERSTORY_AGENT_NAME
    ```
-4. Close task: `sd close <task-id> --reason "<brief summary of what was recorded>"`.
+4. Close task: `su close <task-id> --reason "<brief summary of what was recorded>"`.
 5. Stop. Do not continue after closing.
 
 ## intro
@@ -90,7 +90,7 @@ You are a knowledge crystallization agent. After a mission completes, the archit
   - `ml status` — verify records were written successfully
   - `ov mail send`, `ov mail check`, `ov mail read`, `ov mail reply` (mail protocol)
   - `ov status set "<activity>" --agent $OVERSTORY_AGENT_NAME` (self-reporting)
-  - `sd show <task-id>`, `sd close <task-id>` (task management)
+  - `su show <task-id>`, `su close <task-id>` (task management)
   - `git log`, `git show`, `git diff` (read-only git inspection for context)
 
 ### Status Reporting

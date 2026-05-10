@@ -3,7 +3,13 @@ import { findSeedsDir, readConfig } from "../config.ts";
 import { accent, muted, outputJson, printSuccess } from "../output.ts";
 import { issuesPath, readIssues, withLock, writeIssues } from "../store.ts";
 
-async function syncLabelsToGh(dir: string, issueId: string, issues: Array<{ id: string; githubNumber?: number }>, addLabels?: string[], removeLabels?: string[]): Promise<void> {
+async function syncLabelsToGh(
+	dir: string,
+	issueId: string,
+	issues: Array<{ id: string; githubNumber?: number }>,
+	addLabels?: string[],
+	removeLabels?: string[],
+): Promise<void> {
 	try {
 		const config = await readConfig(dir);
 		if (!config.github_enabled) return;

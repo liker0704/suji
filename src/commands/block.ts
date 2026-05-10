@@ -44,20 +44,32 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 		try {
 			const config = await readConfig(dir);
 			if (config.github_enabled) {
-				const { ghUpdate, bodyWithDeps, detectGitHubRepo, ghIsAvailable } = await import("../github.ts");
+				const { ghUpdate, bodyWithDeps, detectGitHubRepo, ghIsAvailable } = await import(
+					"../github.ts"
+				);
 				if (await ghIsAvailable()) {
-					const repo = config.github_repo ?? await detectGitHubRepo(process.cwd());
+					const repo = config.github_repo ?? (await detectGitHubRepo(process.cwd()));
 					if (repo) {
 						const updatedBlocker = issues[blockerIdx]!;
 						const updatedIssue = issues[issueIdx]!;
 						if (updatedBlocker.githubNumber) {
 							await ghUpdate(updatedBlocker.githubNumber, repo, {
-								description: bodyWithDeps(updatedBlocker.description || "", updatedBlocker, issues, repo),
+								description: bodyWithDeps(
+									updatedBlocker.description || "",
+									updatedBlocker,
+									issues,
+									repo,
+								),
 							});
 						}
 						if (updatedIssue.githubNumber) {
 							await ghUpdate(updatedIssue.githubNumber, repo, {
-								description: bodyWithDeps(updatedIssue.description || "", updatedIssue, issues, repo),
+								description: bodyWithDeps(
+									updatedIssue.description || "",
+									updatedIssue,
+									issues,
+									repo,
+								),
 							});
 						}
 					}

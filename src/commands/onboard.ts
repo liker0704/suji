@@ -6,15 +6,15 @@ import { hasMarkerSection, replaceMarkerSection, wrapInMarkers } from "../marker
 import { outputJson, printSuccess } from "../output.ts";
 
 const ONBOARD_VERSION = 1;
-const VERSION_MARKER = `<!-- seeds-onboard-v:${String(ONBOARD_VERSION)} -->`;
+const VERSION_MARKER = `<!-- suji-onboard-v:${String(ONBOARD_VERSION)} -->`;
 
 const CANDIDATE_FILES = ["CLAUDE.md", ".claude/CLAUDE.md", "AGENTS.md"] as const;
 
 function onboardSnippet(): string {
-	return `## Issue Tracking (Seeds)
+	return `## Issue Tracking (Suji)
 ${VERSION_MARKER}
 
-This project uses [Seeds](https://github.com/jayminwest/seeds) for git-native issue tracking.
+This project uses [Suji](https://github.com/jayminwest/seeds) for git-native issue tracking.
 
 **At the start of every session**, run:
 \`\`\`
@@ -101,7 +101,7 @@ export async function run(args: string[]): Promise<void> {
 		if (jsonMode) {
 			outputJson({ success: true, command: "onboard", action: "created", file: filePath });
 		} else {
-			printSuccess(`Created ${filePath} with seeds section`);
+			printSuccess(`Created ${filePath} with suji section`);
 		}
 		return;
 	}
@@ -113,7 +113,7 @@ export async function run(args: string[]): Promise<void> {
 		if (jsonMode) {
 			outputJson({ success: true, command: "onboard", action: "unchanged", file: filePath });
 		} else {
-			printSuccess("Seeds section is already up to date");
+			printSuccess("Suji section is already up to date");
 		}
 		return;
 	}
@@ -125,7 +125,7 @@ export async function run(args: string[]): Promise<void> {
 			if (jsonMode) {
 				outputJson({ success: true, command: "onboard", action: "updated", file: filePath });
 			} else {
-				printSuccess(`Updated seeds section in ${filePath}`);
+				printSuccess(`Updated suji section in ${filePath}`);
 			}
 		}
 		return;
@@ -137,14 +137,14 @@ export async function run(args: string[]): Promise<void> {
 	if (jsonMode) {
 		outputJson({ success: true, command: "onboard", action: "appended", file: filePath });
 	} else {
-		printSuccess(`Added seeds section to ${filePath}`);
+		printSuccess(`Added suji section to ${filePath}`);
 	}
 }
 
 export function register(program: Command): void {
 	program
 		.command("onboard")
-		.description("Add seeds section to CLAUDE.md / AGENTS.md")
+		.description("Add suji section to CLAUDE.md / AGENTS.md")
 		.option("--stdout", "Print what would be written to stdout")
 		.option("--check", "Check status without modifying files")
 		.option("--json", "Output as JSON")

@@ -1,11 +1,11 @@
 [
 	{
 		"id": "group-8d567544",
-		"name": "seeds-build",
+		"name": "suji-build",
 		"memberIssueIds": [
-			"seeds-l1q",
-			"seeds-awf",
-			"seeds-5mn"
+			"suji-l1q",
+			"suji-awf",
+			"suji-5mn"
 		],
 		"status": "completed",
 		"createdAt": "2026-02-23T15:22:31.132Z",
@@ -13,11 +13,11 @@
 	},
 	{
 		"id": "group-2f223042",
-		"name": "seeds-cli-modernization",
+		"name": "suji-cli-modernization",
 		"memberIssueIds": [
-			"seeds-afd6",
-			"seeds-f350",
-			"seeds-afbb"
+			"suji-afd6",
+			"suji-f350",
+			"suji-afbb"
 		],
 		"status": "completed",
 		"createdAt": "2026-02-24T03:43:49.697Z",
@@ -25,10 +25,10 @@
 	},
 	{
 		"id": "group-3fdc28fc",
-		"name": "seeds-branding",
+		"name": "suji-branding",
 		"memberIssueIds": [
-			"seeds-fc8b",
-			"seeds-58c5"
+			"suji-fc8b",
+			"suji-58c5"
 		],
 		"status": "completed",
 		"createdAt": "2026-02-24T15:41:33.198Z",
@@ -38,7 +38,7 @@
 		"id": "group-3dd9331f",
 		"name": "unblock-command",
 		"memberIssueIds": [
-			"seeds-9474"
+			"suji-9474"
 		],
 		"status": "completed",
 		"createdAt": "2026-03-04T17:23:16.877Z",
@@ -48,7 +48,7 @@
 		"id": "group-bb10eafd",
 		"name": "v1-audit",
 		"memberIssueIds": [
-			"seeds-d5e0"
+			"suji-d5e0"
 		],
 		"status": "active",
 		"createdAt": "2026-03-07T14:32:16.493Z",

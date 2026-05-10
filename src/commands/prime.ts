@@ -13,7 +13,7 @@ function defaultPrimeContent(compact: boolean): string {
 }
 
 function compactContent(): string {
-	return `# Seeds Quick Reference
+	return `# Suji Quick Reference
 
 \`\`\`
 sd ready                  # Find unblocked work
@@ -25,7 +25,7 @@ sd dep add <a> <b>        # a depends on b
 sd blocked                # Show blocked issues
 sd label add <id> <l...>  # Add labels
 sd list --label=bug       # Filter by label
-sd sync                   # Stage + commit .seeds/
+sd sync                   # Stage + commit .suji/
 \`\`\`
 
 **Before finishing:** \`sd close <ids> && sd sync && git push\`
@@ -33,7 +33,7 @@ sd sync                   # Stage + commit .seeds/
 }
 
 function fullContent(): string {
-	return `# Seeds Workflow Context
+	return `# Suji Workflow Context
 
 > **Context Recovery**: Run \`sd prime\` after compaction, clear, or new session
 
@@ -52,7 +52,7 @@ function fullContent(): string {
 **NEVER skip this.** Work is not done until pushed.
 
 ## Core Rules
-- **Default**: Use seeds for ALL task tracking (\`sd create\`, \`sd ready\`, \`sd close\`)
+- **Default**: Use suji for ALL task tracking (\`sd create\`, \`sd ready\`, \`sd close\`)
 - **Prohibited**: Do NOT use TodoWrite, TaskCreate, or markdown files for task tracking
 - **Workflow**: Create issues BEFORE writing code, mark in_progress when starting
 - Git workflow: run \`sd sync\` at session end
@@ -89,7 +89,7 @@ function fullContent(): string {
 - \`sd create --title="..." --labels=bug,ui\` — Create with labels
 
 ### Sync & Project Health
-- \`sd sync\` — Stage and commit .seeds/ changes
+- \`sd sync\` — Stage and commit .suji/ changes
 - \`sd sync --status\` — Check without committing
 - \`sd stats\` — Project statistics
 - \`sd doctor\` — Check for data integrity issues
@@ -106,7 +106,7 @@ sd update <id> --status=in_progress   # Claim it
 **Completing work:**
 \`\`\`bash
 sd close <id1> <id2> ...    # Close all completed issues at once
-sd sync                     # Stage + commit .seeds/
+sd sync                     # Stage + commit .suji/
 git push                    # Push to remote
 \`\`\`
 
@@ -135,7 +135,7 @@ export async function run(args: string[]): Promise<void> {
 		return;
 	}
 
-	// Try to find seeds dir for custom PRIME.md
+	// Try to find suji dir for custom PRIME.md
 	let content: string | null = null;
 	try {
 		const seedsDir = await findSeedsDir();
@@ -144,7 +144,7 @@ export async function run(args: string[]): Promise<void> {
 			content = await customFile.text();
 		}
 	} catch {
-		// No seeds dir — that's fine, use default
+		// No suji dir — that's fine, use default
 	}
 
 	if (!content) {

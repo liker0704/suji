@@ -24,7 +24,7 @@ async function run(
 }
 
 beforeEach(async () => {
-	tmpDir = await mkdtemp(join(tmpdir(), "seeds-init-test-"));
+	tmpDir = await mkdtemp(join(tmpdir(), "suji-init-test-"));
 });
 
 afterEach(async () => {
@@ -32,16 +32,16 @@ afterEach(async () => {
 });
 
 describe("sd init", () => {
-	test("creates .seeds directory", async () => {
+	test("creates .suji directory", async () => {
 		const { exitCode } = await run(["init"], tmpDir);
 		expect(exitCode).toBe(0);
-		const stat = await Bun.file(join(tmpDir, ".seeds", "config.yaml")).exists();
+		const stat = await Bun.file(join(tmpDir, ".suji", "config.yaml")).exists();
 		expect(stat).toBe(true);
 	});
 
 	test("creates config.yaml with project name derived from directory", async () => {
 		await run(["init"], tmpDir);
-		const config = await Bun.file(join(tmpDir, ".seeds", "config.yaml")).text();
+		const config = await Bun.file(join(tmpDir, ".suji", "config.yaml")).text();
 		const dirName = tmpDir.split("/").pop()!;
 		expect(config).toContain(`project: "${dirName}"`);
 		expect(config).toContain("version:");
@@ -49,27 +49,27 @@ describe("sd init", () => {
 
 	test("creates empty issues.jsonl", async () => {
 		await run(["init"], tmpDir);
-		const exists = await Bun.file(join(tmpDir, ".seeds", "issues.jsonl")).exists();
+		const exists = await Bun.file(join(tmpDir, ".suji", "issues.jsonl")).exists();
 		expect(exists).toBe(true);
 	});
 
 	test("creates empty templates.jsonl", async () => {
 		await run(["init"], tmpDir);
-		const exists = await Bun.file(join(tmpDir, ".seeds", "templates.jsonl")).exists();
+		const exists = await Bun.file(join(tmpDir, ".suji", "templates.jsonl")).exists();
 		expect(exists).toBe(true);
 	});
 
 	test("creates .gitignore ignoring lock files", async () => {
 		await run(["init"], tmpDir);
-		const gitignore = await Bun.file(join(tmpDir, ".seeds", ".gitignore")).text();
+		const gitignore = await Bun.file(join(tmpDir, ".suji", ".gitignore")).text();
 		expect(gitignore).toContain("*.lock");
 	});
 
 	test("appends gitattributes to project root", async () => {
 		await run(["init"], tmpDir);
 		const gitattributes = await Bun.file(join(tmpDir, ".gitattributes")).text();
-		expect(gitattributes).toContain(".seeds/issues.jsonl merge=union");
-		expect(gitattributes).toContain(".seeds/templates.jsonl merge=union");
+		expect(gitattributes).toContain(".suji/issues.jsonl merge=union");
+		expect(gitattributes).toContain(".suji/templates.jsonl merge=union");
 	});
 
 	test("is idempotent — second init does not fail", async () => {

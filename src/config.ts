@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import type { Config } from "./types.ts";
-import { CONFIG_FILE, SEEDS_DIR_NAME } from "./types.ts";
+import { CONFIG_FILE, SUJI_DIR_NAME } from "./types.ts";
 import { parseYaml, stringifyYaml } from "./yaml.ts";
 
 export async function readConfig(seedsDir: string): Promise<Config> {
@@ -9,11 +9,15 @@ export async function readConfig(seedsDir: string): Promise<Config> {
 	const content = await file.text();
 	const data = parseYaml(content);
 	return {
-		project: data.project ?? "seeds",
+		project: data.project ?? "suji",
 		version: data.version ?? "1",
-		...(data.github_enabled !== undefined ? { github_enabled: String(data.github_enabled) === "true" } : {}),
+		...(data.github_enabled !== undefined
+			? { github_enabled: String(data.github_enabled) === "true" }
+			: {}),
 		...(data.github_repo ? { github_repo: String(data.github_repo) } : {}),
-		...(data.github_sync_on_write !== undefined ? { github_sync_on_write: String(data.github_sync_on_write) === "true" } : {}),
+		...(data.github_sync_on_write !== undefined
+			? { github_sync_on_write: String(data.github_sync_on_write) === "true" }
+			: {}),
 	};
 }
 
@@ -49,7 +53,7 @@ function resolveWorktreeRoot(candidateSeedsDir: string): string {
 	const mainResolved = resolve(mainRoot);
 	if (mainResolved === resolve(candidateRoot)) return candidateSeedsDir;
 
-	const mainSeedsDir = join(mainResolved, SEEDS_DIR_NAME);
+	const mainSeedsDir = join(mainResolved, SUJI_DIR_NAME);
 	if (existsSync(join(mainSeedsDir, CONFIG_FILE))) {
 		return mainSeedsDir;
 	}
@@ -70,14 +74,14 @@ export function isInsideWorktree(dir?: string): boolean {
 export async function findSeedsDir(startDir?: string): Promise<string> {
 	let dir = startDir ?? process.cwd();
 	while (true) {
-		const configPath = join(dir, SEEDS_DIR_NAME, CONFIG_FILE);
+		const configPath = join(dir, SUJI_DIR_NAME, CONFIG_FILE);
 		const file = Bun.file(configPath);
 		if (await file.exists()) {
-			return resolveWorktreeRoot(join(dir, SEEDS_DIR_NAME));
+			return resolveWorktreeRoot(join(dir, SUJI_DIR_NAME));
 		}
 		const parent = dirname(dir);
 		if (parent === dir) {
-			throw new Error("Not in a seeds project. Run `sd init` first.");
+			throw new Error("Not in a suji project. Run `sd init` first.");
 		}
 		dir = parent;
 	}

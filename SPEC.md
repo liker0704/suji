@@ -1,4 +1,4 @@
-# Seeds
+# Suji
 
 Git-native issue tracker for AI agent workflows. Zero dependencies, JSONL storage, Bun runtime.
 
@@ -14,7 +14,7 @@ Beads works but carries baggage overstory doesn't need:
 - **Concurrent access contention** — multiple agents fighting over `beads.db` lock
 - **Dual source of truth** — binary DB + JSONL export, manually kept in sync
 
-Overstory uses ~7 beads operations on a simple data model. Seeds covers exactly that surface.
+Overstory uses ~7 beads operations on a simple data model. Suji covers exactly that surface.
 
 ## Design Principles
 
@@ -27,7 +27,7 @@ Overstory uses ~7 beads operations on a simple data model. Seeds covers exactly 
 ## On-Disk Format
 
 ```
-.seeds/
+.suji/
   config.yaml          # Project config (YAML, matches overstory/mulch convention)
   issues.jsonl         # All issues, one JSON object per line
   templates.jsonl      # Molecule/template definitions
@@ -43,7 +43,7 @@ version: "1"
 
 The `project` field is used as the ID prefix (e.g., `overstory-a1b2`).
 
-YAML parsed by a minimal built-in subset parser (~50 LOC) that handles the flat key-value format seeds needs. No external dependency.
+YAML parsed by a minimal built-in subset parser (~50 LOC) that handles the flat key-value format suji needs. No external dependency.
 
 ### issues.jsonl
 
@@ -71,11 +71,11 @@ Molecule/template definitions, one per line:
 ### .gitattributes (appended to project root)
 
 ```
-.seeds/issues.jsonl merge=union
-.seeds/templates.jsonl merge=union
+.suji/issues.jsonl merge=union
+.suji/templates.jsonl merge=union
 ```
 
-Union merge strategy: on branch merge, git takes lines from both sides. Since each issue is one line with a unique ID, this produces correct results for parallel agent work. Duplicate lines (same issue modified on both branches) are handled by seeds' dedup-on-read — last occurrence wins.
+Union merge strategy: on branch merge, git takes lines from both sides. Since each issue is one line with a unique ID, this produces correct results for parallel agent work. Duplicate lines (same issue modified on both branches) are handled by suji' dedup-on-read — last occurrence wins.
 
 ## Data Model
 
@@ -169,73 +169,73 @@ Accepts both numeric (`--priority=2`) and shorthand (`--priority=P2`).
 
 ## CLI
 
-Binary name: `sd` (like `bd` for beads, `mulch` for mulch).
+Binary name: `su` (like `bd` for beads, `mulch` for mulch).
 
 Every command supports `--json` for structured output. Non-JSON output is human-readable with ANSI colors (respects `NO_COLOR`).
 
 ### Issue Commands
 
 ```
-sd init                                Initialize .seeds/ in current directory
+su init                                Initialize .suji/ in current directory
 
-sd create                              Create a new issue
+su create                              Create a new issue
   --title <text>       (required)
   --type <type>        task|bug|feature|epic (default: task)
   --priority <n>       0-4 or P0-P4 (default: 2)
   --description <text>
   --assignee <name>
 
-sd show <id>                           Show issue details
+su show <id>                           Show issue details
 
-sd list                                List issues with filters
+su list                                List issues with filters
   --status <status>    open|in_progress|closed
   --type <type>        task|bug|feature|epic
   --assignee <name>
   --limit <n>          Max results (default: 50)
 
-sd ready                               Show open issues with no unresolved blockers
+su ready                               Show open issues with no unresolved blockers
 
-sd update <id>                         Update issue fields
+su update <id>                         Update issue fields
   --status <status>
   --title <text>
   --priority <n>
   --assignee <name>
   --description <text>
 
-sd close <id> [<id2> ...]              Close one or more issues
+su close <id> [<id2> ...]              Close one or more issues
   --reason <text>      Closure summary
 
-sd dep add <issue> <depends-on>        Add dependency (issue depends on depends-on)
-sd dep remove <issue> <depends-on>     Remove dependency
-sd dep list <issue>                    Show deps for an issue
+su dep add <issue> <depends-on>        Add dependency (issue depends on depends-on)
+su dep remove <issue> <depends-on>     Remove dependency
+su dep list <issue>                    Show deps for an issue
 
-sd blocked                             Show all blocked issues
+su blocked                             Show all blocked issues
 
-sd stats                               Project statistics (open/closed/blocked counts)
+su stats                               Project statistics (open/closed/blocked counts)
 
-sd sync                                Stage and commit .seeds/ changes
+su sync                                Stage and commit .suji/ changes
   --status             Check for uncommitted changes without committing
 ```
 
 ### Template (Molecule) Commands
 
 ```
-sd tpl create                          Create a template
+su tpl create                          Create a template
   --name <text>        (required)      Human-readable name
 
-sd tpl step add <template-id>          Add a step to a template
+su tpl step add <template-id>          Add a step to a template
   --title <text>       (required)      Step title (supports {prefix} interpolation)
   --type <type>        task|bug|feature|epic (default: task)
   --priority <n>       0-4 (default: 2)
 
-sd tpl list                            List all templates
+su tpl list                            List all templates
 
-sd tpl show <template-id>              Show template with steps
+su tpl show <template-id>              Show template with steps
 
-sd tpl pour <template-id>              Instantiate template into real issues
+su tpl pour <template-id>              Instantiate template into real issues
   --prefix <text>      Replaces {prefix} in step titles
 
-sd tpl status <template-id>            Show convoy status (completion of poured issues)
+su tpl status <template-id>            Show convoy status (completion of poured issues)
 ```
 
 ### JSON Output Format
@@ -267,7 +267,7 @@ Stolen from mulch (which handles multi-agent writes in production today).
 ### Advisory File Locking
 
 ```
-Lock file:    .seeds/issues.jsonl.lock
+Lock file:    .suji/issues.jsonl.lock
 Stale after:  30 seconds
 Retry:        50ms polling
 Timeout:      5 seconds
@@ -294,21 +294,21 @@ Creates (appends) are simpler: acquire lock, append line, release lock.
 
 ### Dedup on Read
 
-After a `merge=union` git merge, `issues.jsonl` may contain duplicate lines for the same issue ID (both branches modified it). On read, seeds deduplicates by ID — last occurrence wins (later line = later mutation).
+After a `merge=union` git merge, `issues.jsonl` may contain duplicate lines for the same issue ID (both branches modified it). On read, suji deduplicates by ID — last occurrence wins (later line = later mutation).
 
 This means:
 - No custom merge driver needed
 - Parallel branch work just works
 - File may grow with duplicates between compactions
-- `sd compact` (future) can remove duplicate lines when needed
+- `su compact` (future) can remove duplicate lines when needed
 
 ## Migration from Beads
 
-One-time migration script: `sd migrate-from-beads`
+One-time migration script: `su migrate-from-beads`
 
 1. Read `.beads/issues.jsonl` (the JSONL export beads already maintains)
 2. Map fields: `issue_type` → `type`, `owner` → `assignee`, etc.
-3. Write to `.seeds/issues.jsonl`
+3. Write to `.suji/issues.jsonl`
 4. Preserve original IDs (they already use `{project}-{hex}` format)
 
 The beads JSONL export is the source — no need to touch `beads.db`.
@@ -317,28 +317,28 @@ The beads JSONL export is the source — no need to touch `beads.db`.
 
 ### Client Interface
 
-Overstory wraps seeds the same way it wraps beads — via `Bun.spawn(["sd", ...])` with `--json` parsing. The `BeadsClient` interface maps 1:1:
+Overstory wraps suji the same way it wraps beads — via `Bun.spawn(["su", ...])` with `--json` parsing. The `BeadsClient` interface maps 1:1:
 
-| BeadsClient method | sd command |
+| BeadsClient method | su command |
 |--------------------|------------|
-| `ready()`          | `sd ready --json` |
-| `show(id)`         | `sd show <id> --json` |
-| `create(title, opts)` | `sd create --title "..." --json` |
-| `claim(id)`        | `sd update <id> --status=in_progress --json` |
-| `close(id, reason)` | `sd close <id> --reason "..." --json` |
-| `list(opts)`       | `sd list --json` |
+| `ready()`          | `su ready --json` |
+| `show(id)`         | `su show <id> --json` |
+| `create(title, opts)` | `su create --title "..." --json` |
+| `claim(id)`        | `su update <id> --status=in_progress --json` |
+| `close(id, reason)` | `su close <id> --reason "..." --json` |
+| `list(opts)`       | `su list --json` |
 
-Rename the client file from `beads/client.ts` to `seeds/client.ts`, update the spawn command, done. The `BeadIssue` → `SeedIssue` type is structurally identical.
+Rename the client file from `beads/client.ts` to `suji/client.ts`, update the spawn command, done. The `BeadIssue` → `SeedIssue` type is structurally identical.
 
 ### Molecule Migration
 
-| BeadsMolecule method | sd command |
+| BeadsMolecule method | su command |
 |----------------------|------------|
-| `createMoleculePrototype()` | `sd tpl create --name "..." --json` |
-| `addStep()` | `sd tpl step add <id> --title "..." --json` |
-| `pourMolecule()` | `sd tpl pour <id> --json` |
-| `getConvoyStatus()` | `sd tpl status <id> --json` |
-| `listPrototypes()` | `sd tpl list --json` |
+| `createMoleculePrototype()` | `su tpl create --name "..." --json` |
+| `addStep()` | `su tpl step add <id> --title "..." --json` |
+| `pourMolecule()` | `su tpl pour <id> --json` |
+| `getConvoyStatus()` | `su tpl status <id> --json` |
+| `listPrototypes()` | `su tpl list --json` |
 
 ### Agent-Facing Commands
 
@@ -346,43 +346,43 @@ Agents use the same commands they currently use with beads:
 
 ```bash
 # Builder agents
-sd show <task-id>                    # View assigned task
-sd close <task-id> --reason "..."    # Report completion
+su show <task-id>                    # View assigned task
+su close <task-id> --reason "..."    # Report completion
 
 # Lead agents
-sd create --title="..." --type=task --priority=2
-sd show <id>
-sd ready
-sd close <id> --reason "..."
-sd sync
+su create --title="..." --type=task --priority=2
+su show <id>
+su ready
+su close <id> --reason "..."
+su sync
 ```
 
 ### Hooks Integration
 
-Seeds hooks are simpler than beads' — there's no daemon to manage and no export pipeline. The only hook seeds needs is optional:
+Suji hooks are simpler than beads' — there's no daemon to manage and no export pipeline. The only hook suji needs is optional:
 
 ```json
 {
   "hooks": {
     "PreCommit": [{
-      "command": "sd sync --status",
-      "description": "Warn if seeds changes are unstaged"
+      "command": "su sync --status",
+      "description": "Warn if suji changes are unstaged"
     }]
   }
 }
 ```
 
-## What Seeds Does NOT Do
+## What Suji Does NOT Do
 
 Explicitly out of scope (keep it minimal):
 
 - **No daemon.** No background process, no socket, no PID files.
 - **No binary database.** JSONL only. No SQLite, no Dolt.
-- **No audit trail / version history.** Git IS the audit trail. Use `git log .seeds/issues.jsonl`.
+- **No audit trail / version history.** Git IS the audit trail. Use `git log .suji/issues.jsonl`.
 - **No custom merge driver.** `merge=union` handles everything. Dedup on read handles edge cases.
 - **No user management.** Assignee is a free-text string. No authentication, no permissions.
-- **No remote sync.** `sd sync` commits locally. `git push` handles the rest.
-- **No compact command (yet).** Dedup on read is sufficient. Ship `sd compact` when file bloat becomes a real problem.
+- **No remote sync.** `su sync` commits locally. `git push` handles the rest.
+- **No compact command (yet).** Dedup on read is sufficient. Ship `su compact` when file bloat becomes a real problem.
 
 ## Tech Stack
 
@@ -403,7 +403,7 @@ Explicitly out of scope (keep it minimal):
 ### Directory Structure
 
 ```
-seeds/
+suji/
   package.json
   tsconfig.json
   biome.json
@@ -429,19 +429,19 @@ seeds/
     output.ts                 # JSON + human output helpers
     yaml.ts                   # Minimal YAML parser (flat key-value only)
     commands/
-      init.ts                 # sd init
-      create.ts               # sd create
-      show.ts                 # sd show
-      list.ts                 # sd list
-      ready.ts                # sd ready
-      update.ts               # sd update
-      close.ts                # sd close
-      dep.ts                  # sd dep add/remove/list
-      sync.ts                 # sd sync
-      blocked.ts              # sd blocked
-      stats.ts                # sd stats
-      tpl.ts                  # sd tpl create/step/list/show/pour/status
-      migrate.ts              # sd migrate-from-beads
+      init.ts                 # su init
+      create.ts               # su create
+      show.ts                 # su show
+      list.ts                 # su list
+      ready.ts                # su ready
+      update.ts               # su update
+      close.ts                # su close
+      dep.ts                  # su dep add/remove/list
+      sync.ts                 # su sync
+      blocked.ts              # su blocked
+      stats.ts                # su stats
+      tpl.ts                  # su tpl create/step/list/show/pour/status
+      migrate.ts              # su migrate-from-beads
     store.test.ts             # Core data layer tests
     id.test.ts                # ID generation tests
     yaml.test.ts              # YAML parser tests
@@ -482,7 +482,7 @@ Script updates both files atomically and prints next steps.
 - Atomic writes with dedup-on-read
 - YAML config, JSONL storage
 - --json flag on all commands
-- Migration from beads (sd migrate-from-beads)
+- Migration from beads (su migrate-from-beads)
 ```
 
 ### /release Slash Command

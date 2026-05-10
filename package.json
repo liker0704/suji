@@ -1,10 +1,10 @@
 {
-	"name": "@os-eco/seeds-cli",
+	"name": "@hana/suji-cli",
 	"version": "0.2.5",
 	"description": "Git-native issue tracker for AI agent workflows",
 	"type": "module",
 	"bin": {
-		"sd": "./src/index.ts"
+		"su": "./src/index.ts"
 	},
 	"main": "src/index.ts",
 	"files": ["src"],
@@ -17,13 +17,13 @@
 	"keywords": ["issue-tracking", "git", "ai", "agents", "cli", "developer-tools"],
 	"author": "Jaymin West",
 	"license": "MIT",
-	"homepage": "https://github.com/jayminwest/seeds",
+	"homepage": "https://github.com/liker0704/suji",
 	"bugs": {
-		"url": "https://github.com/jayminwest/seeds/issues"
+		"url": "https://github.com/liker0704/suji/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/jayminwest/seeds.git"
+		"url": "https://github.com/liker0704/suji.git"
 	},
 	"scripts": {
 		"test": "bun test",

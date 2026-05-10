@@ -24,14 +24,14 @@ describe("parseYaml", () => {
 	});
 
 	test("ignores blank lines", () => {
-		const result = parseYaml("project: seeds\n\nversion: 1");
-		expect(result.project).toBe("seeds");
+		const result = parseYaml("project: suji\n\nversion: 1");
+		expect(result.project).toBe("suji");
 		expect(result.version).toBe("1");
 	});
 
 	test("ignores comment lines", () => {
-		const result = parseYaml("# This is a comment\nproject: seeds");
-		expect(result.project).toBe("seeds");
+		const result = parseYaml("# This is a comment\nproject: suji");
+		expect(result.project).toBe("suji");
 		expect(Object.keys(result)).not.toContain("# This is a comment");
 	});
 
@@ -40,7 +40,7 @@ describe("parseYaml", () => {
 		expect(Object.keys(result)).toHaveLength(0);
 	});
 
-	test("parses config.yaml format used by seeds", () => {
+	test("parses config.yaml format used by suji", () => {
 		const yaml = 'project: overstory\nversion: "1"';
 		const result = parseYaml(yaml);
 		expect(result).toEqual({ project: "overstory", version: "1" });
@@ -52,16 +52,16 @@ describe("parseYaml", () => {
 	});
 
 	test("trims whitespace from keys and values", () => {
-		const result = parseYaml("  project : seeds  ");
-		expect(result.project).toBe("seeds");
+		const result = parseYaml("  project : suji  ");
+		expect(result.project).toBe("suji");
 	});
 });
 
 describe("stringifyYaml", () => {
 	test("serializes simple key-value pairs", () => {
-		const yaml = stringifyYaml({ project: "seeds", version: "1" });
+		const yaml = stringifyYaml({ project: "suji", version: "1" });
 		const parsed = parseYaml(yaml);
-		expect(parsed.project).toBe("seeds");
+		expect(parsed.project).toBe("suji");
 		expect(parsed.version).toBe("1");
 	});
 

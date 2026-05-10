@@ -43,11 +43,11 @@ interface DoctorResult {
 }
 
 function seedsDir(dir: string): string {
-	return join(dir, ".seeds");
+	return join(dir, ".suji");
 }
 
 beforeEach(async () => {
-	tmpDir = await mkdtemp(join(tmpdir(), "seeds-doctor-test-"));
+	tmpDir = await mkdtemp(join(tmpdir(), "suji-doctor-test-"));
 });
 
 afterEach(async () => {
@@ -55,7 +55,7 @@ afterEach(async () => {
 });
 
 describe("doctor: config check", () => {
-	test("fails when .seeds/ directory is missing", async () => {
+	test("fails when .suji/ directory is missing", async () => {
 		const { exitCode } = await run(["doctor"], tmpDir);
 		expect(exitCode).not.toBe(0);
 	});
@@ -457,8 +457,8 @@ describe("doctor: gitattributes check", () => {
 		expect(check?.status).toBe("pass");
 
 		const content = readFileSync(gitattrsPath, "utf8");
-		expect(content).toContain(".seeds/issues.jsonl merge=union");
-		expect(content).toContain(".seeds/templates.jsonl merge=union");
+		expect(content).toContain(".suji/issues.jsonl merge=union");
+		expect(content).toContain(".suji/templates.jsonl merge=union");
 	});
 });
 

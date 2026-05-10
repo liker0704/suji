@@ -24,7 +24,7 @@ describe("--timing flag", () => {
 	let tmpDir: string;
 
 	test("--timing prints elapsed time to stderr", async () => {
-		tmpDir = await mkdtemp(join(tmpdir(), "seeds-timing-"));
+		tmpDir = await mkdtemp(join(tmpdir(), "suji-timing-"));
 		try {
 			// init so stats has something to run against
 			await run(["init"], tmpDir);
@@ -36,7 +36,7 @@ describe("--timing flag", () => {
 	});
 
 	test("without --timing, no timing on stderr", async () => {
-		tmpDir = await mkdtemp(join(tmpdir(), "seeds-timing-"));
+		tmpDir = await mkdtemp(join(tmpdir(), "suji-timing-"));
 		try {
 			await run(["init"], tmpDir);
 			const { stderr } = await run(["stats"], tmpDir);
@@ -47,7 +47,7 @@ describe("--timing flag", () => {
 	});
 
 	test("--json --timing keeps stdout as clean JSON, timing on stderr", async () => {
-		tmpDir = await mkdtemp(join(tmpdir(), "seeds-timing-"));
+		tmpDir = await mkdtemp(join(tmpdir(), "suji-timing-"));
 		try {
 			await run(["init"], tmpDir);
 			const { stdout, stderr } = await run(["stats", "--json", "--timing"], tmpDir);

@@ -14,7 +14,7 @@ function git(args: string[], cwd: string): void {
 }
 
 function initSeedsDir(root: string): void {
-	const seedsDir = join(root, ".seeds");
+	const seedsDir = join(root, ".suji");
 	mkdirSync(seedsDir, { recursive: true });
 	writeFileSync(join(seedsDir, "config.yaml"), 'project: "test"\nversion: "1"\n');
 	writeFileSync(join(seedsDir, "issues.jsonl"), "");
@@ -23,7 +23,7 @@ function initSeedsDir(root: string): void {
 let tmpDir: string;
 
 beforeEach(async () => {
-	tmpDir = realpathSync(await mkdtemp(join(tmpdir(), "seeds-config-test-")));
+	tmpDir = realpathSync(await mkdtemp(join(tmpdir(), "suji-config-test-")));
 });
 
 afterEach(async () => {
@@ -44,12 +44,12 @@ describe("findSeedsDir — worktree resolution", () => {
 		const wtDir = join(tmpDir, "wt");
 		git(["worktree", "add", wtDir, "-b", "wt-branch"], mainRepo);
 
-		// worktree also gets .seeds/ via the branch content
+		// worktree also gets .suji/ via the branch content
 		const result = await findSeedsDir(wtDir);
-		expect(result).toBe(join(mainRepo, ".seeds"));
+		expect(result).toBe(join(mainRepo, ".suji"));
 	});
 
-	test("falls back to worktree .seeds/ when main root has none", async () => {
+	test("falls back to worktree .suji/ when main root has none", async () => {
 		const mainRepo = join(tmpDir, "main");
 		mkdirSync(mainRepo);
 		git(["init"], mainRepo);
@@ -62,11 +62,11 @@ describe("findSeedsDir — worktree resolution", () => {
 		const wtDir = join(tmpDir, "wt");
 		git(["worktree", "add", wtDir, "-b", "wt-branch"], mainRepo);
 
-		// Only init .seeds/ in worktree, NOT in main
+		// Only init .suji/ in worktree, NOT in main
 		initSeedsDir(wtDir);
 
 		const result = await findSeedsDir(wtDir);
-		expect(result).toBe(join(wtDir, ".seeds"));
+		expect(result).toBe(join(wtDir, ".suji"));
 	});
 
 	test("no-op when in main repo (not a worktree)", async () => {
@@ -76,7 +76,7 @@ describe("findSeedsDir — worktree resolution", () => {
 		initSeedsDir(mainRepo);
 
 		const result = await findSeedsDir(mainRepo);
-		expect(result).toBe(join(mainRepo, ".seeds"));
+		expect(result).toBe(join(mainRepo, ".suji"));
 	});
 
 	test("no-op when not in a git repo", async () => {
@@ -85,7 +85,7 @@ describe("findSeedsDir — worktree resolution", () => {
 		initSeedsDir(plainDir);
 
 		const result = await findSeedsDir(plainDir);
-		expect(result).toBe(join(plainDir, ".seeds"));
+		expect(result).toBe(join(plainDir, ".suji"));
 	});
 });
 

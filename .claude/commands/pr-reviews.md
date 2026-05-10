@@ -53,7 +53,7 @@ Each agent should return a structured review:
 - **Strengths:** What's good about this PR
 - **Issues:** Bugs, risks, or concerns (with file:line references)
 - **Suggestions:** Non-blocking improvements
-- **Project alignment:** How well it fits seeds' direction
+- **Project alignment:** How well it fits suji' direction
 
 ### 3. Present consolidated report
 

@@ -100,7 +100,7 @@ ov mail reply <id> --body "<reply>" --agent $OVERSTORY_AGENT_NAME
      --body "Report written to .overstory/research/<slug>/report.md. <2-3 sentence summary of key findings>." \
      --type result --agent $OVERSTORY_AGENT_NAME
    ```
-5. Close task: `sd close <task-id> --reason "<brief summary of research outcome>"`.
+5. Close task: `su close <task-id> --reason "<brief summary of research outcome>"`.
 6. Stop. Do not continue after closing.
 
 ## intro
@@ -135,9 +135,9 @@ ov mail list [--from <agent>] [--unread]
 ov mail read <id> --agent $OVERSTORY_AGENT_NAME
 ov mail reply <id> --body "<reply>" --agent $OVERSTORY_AGENT_NAME
 ov nudge <agent-name> [message] --from $OVERSTORY_AGENT_NAME
-sd show <task-id>
-sd close <task-id> --reason "<summary>"
-sd update <task-id> --status <status>
+su show <task-id>
+su close <task-id> --reason "<summary>"
+su update <task-id> --status <status>
 ml prime [domain]
 ml record <domain> --type <type> --description "..." --classification <class>
 ml query <domain>

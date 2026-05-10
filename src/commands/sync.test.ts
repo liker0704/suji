@@ -14,7 +14,7 @@ function git(args: string[], cwd: string): void {
 }
 
 function initSeedsDir(root: string): void {
-	const seedsDir = join(root, ".seeds");
+	const seedsDir = join(root, ".suji");
 	mkdirSync(seedsDir, { recursive: true });
 	writeFileSync(join(seedsDir, "config.yaml"), 'project: "test"\nversion: "1"\n');
 	writeFileSync(join(seedsDir, "issues.jsonl"), "");
@@ -24,7 +24,7 @@ function initSeedsDir(root: string): void {
 let tmpDir: string;
 
 beforeEach(async () => {
-	tmpDir = realpathSync(await mkdtemp(join(tmpdir(), "seeds-sync-test-")));
+	tmpDir = realpathSync(await mkdtemp(join(tmpdir(), "suji-sync-test-")));
 });
 
 afterEach(async () => {
@@ -109,7 +109,7 @@ describe("sync — worktree guard", () => {
 		git(["commit", "-m", "init"], mainRepo);
 
 		// Create a new issue to have uncommitted changes
-		const issuesPath = join(mainRepo, ".seeds", "issues.jsonl");
+		const issuesPath = join(mainRepo, ".suji", "issues.jsonl");
 		writeFileSync(
 			issuesPath,
 			'{"id":"test-0001","title":"Test","status":"open","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}\n',

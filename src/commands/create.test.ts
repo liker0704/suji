@@ -28,7 +28,7 @@ async function runJson<T = unknown>(args: string[], cwd: string): Promise<T> {
 }
 
 beforeEach(async () => {
-	tmpDir = await mkdtemp(join(tmpdir(), "seeds-create-test-"));
+	tmpDir = await mkdtemp(join(tmpdir(), "suji-create-test-"));
 	await run(["init"], tmpDir);
 });
 

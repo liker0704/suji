@@ -1,9 +1,9 @@
 /**
- * GitHub mirror — bidirectional sync between seeds and GitHub Issues.
+ * GitHub mirror — bidirectional sync between suji and GitHub Issues.
  *
  * Uses `gh` CLI for all GitHub operations. No npm dependencies needed.
  * All functions are non-fatal: if gh is unavailable or network fails,
- * seeds continues working locally.
+ * suji continues working locally.
  */
 
 import type { Config, Issue } from "./types.ts";
@@ -50,14 +50,10 @@ export async function resolveRepo(config: Config, cwd: string): Promise<string |
 }
 
 /**
- * Build the <!-- seeds:deps --> section for a GitHub issue body.
+ * Build the <!-- suji:deps --> section for a GitHub issue body.
  * Resolves blocks/blockedBy sd IDs to GitHub issue numbers and titles.
  */
-export function buildDepsSection(
-	issue: Issue,
-	allIssues: Issue[],
-	repo: string,
-): string {
+export function buildDepsSection(issue: Issue, allIssues: Issue[], repo: string): string {
 	const blocks = issue.blocks ?? [];
 	const blockedBy = issue.blockedBy ?? [];
 	if (blocks.length === 0 && blockedBy.length === 0) return "";
@@ -70,26 +66,26 @@ export function buildDepsSection(
 		return `\`${sdId}\` (not synced)`;
 	};
 
-	const lines = ["<!-- seeds:deps -->", "### Issue Dependencies"];
+	const lines = ["<!-- suji:deps -->", "### Issue Dependencies"];
 	if (blocks.length > 0) {
 		lines.push(`- **Blocks:** ${blocks.map(resolveLink).join(", ")}`);
 	}
 	if (blockedBy.length > 0) {
 		lines.push(`- **Blocked by:** ${blockedBy.map(resolveLink).join(", ")}`);
 	}
-	lines.push("<!-- /seeds:deps -->");
+	lines.push("<!-- /suji:deps -->");
 	return lines.join("\n");
 }
 
 /**
- * Parse <!-- seeds:deps --> section from a GitHub issue body.
+ * Parse <!-- suji:deps --> section from a GitHub issue body.
  * Returns GitHub issue numbers for blocks/blockedBy.
  */
 export function parseDepsFromBody(body: string): { blocks: number[]; blockedBy: number[] } {
 	const blocks: number[] = [];
 	const blockedBy: number[] = [];
 
-	const match = body.match(/<!-- seeds:deps -->([\s\S]*?)<!-- \/seeds:deps -->/);
+	const match = body.match(/<!-- suji:deps -->([\s\S]*?)<!-- \/suji:deps -->/);
 	if (!match?.[1]) return { blocks, blockedBy };
 
 	const section = match[1];
@@ -110,18 +106,14 @@ export function parseDepsFromBody(body: string): { blocks: number[]; blockedBy: 
 	return { blocks, blockedBy };
 }
 
-/** Create a GitHub issue mirroring a seeds issue. Returns gh issue number or null. */
+/** Create a GitHub issue mirroring a suji issue. Returns gh issue number or null. */
 export async function ghCreate(
 	issue: Issue,
 	repo: string,
 	allIssues?: Issue[],
 ): Promise<number | null> {
 	try {
-		const bodyParts = [
-			issue.description || "",
-			"",
-			`_Seeds ID: \`${issue.id}\`_`,
-		];
+		const bodyParts = [issue.description || "", "", `_Seeds ID: \`${issue.id}\`_`];
 
 		// Add dependency section if issue has blocks/blockedBy
 		if (allIssues) {
@@ -133,12 +125,7 @@ export async function ghCreate(
 
 		const body = bodyParts.join("\n");
 
-		const args = [
-			"gh", "issue", "create",
-			"--repo", repo,
-			"--title", issue.title,
-			"--body", body,
-		];
+		const args = ["gh", "issue", "create", "--repo", repo, "--title", issue.title, "--body", body];
 
 		// Add labels if they exist (created by sd init --github)
 		const labels: string[] = [];
@@ -206,13 +193,20 @@ export async function ghUpdate(
 export async function ghList(
 	repo: string,
 	opts?: { state?: "open" | "closed" | "all"; limit?: number },
-): Promise<Array<{ number: number; title: string; state: string; labels: string[]; body: string }>> {
+): Promise<
+	Array<{ number: number; title: string; state: string; labels: string[]; body: string }>
+> {
 	try {
 		const args = [
-			"gh", "issue", "list",
-			"--repo", repo,
-			"--json", "number,title,state,labels,body",
-			"--limit", String(opts?.limit ?? 100),
+			"gh",
+			"issue",
+			"list",
+			"--repo",
+			repo,
+			"--json",
+			"number,title,state,labels,body",
+			"--limit",
+			String(opts?.limit ?? 100),
 		];
 		if (opts?.state) args.push("--state", opts.state);
 
@@ -250,9 +244,11 @@ export async function ghListComments(
 	try {
 		const proc = Bun.spawn(
 			[
-				"gh", "api",
+				"gh",
+				"api",
 				`repos/${repo}/issues/${githubNumber}/comments`,
-				"--jq", ".[] | {id: .id, body: .body, author: .user.login, createdAt: .created_at}",
+				"--jq",
+				".[] | {id: .id, body: .body, author: .user.login, createdAt: .created_at}",
 			],
 			{ stdout: "pipe", stderr: "pipe" },
 		);
@@ -265,7 +261,12 @@ export async function ghListComments(
 			.split("\n")
 			.filter((l) => l.length > 0)
 			.map((line) => {
-				const parsed = JSON.parse(line) as { id: number; body: string; author: string; createdAt: string };
+				const parsed = JSON.parse(line) as {
+					id: number;
+					body: string;
+					author: string;
+					createdAt: string;
+				};
 				return parsed;
 			});
 	} catch {
@@ -273,28 +274,30 @@ export async function ghListComments(
 	}
 }
 
-/** Strip existing seeds:deps section from a body string. */
+/** Strip existing suji:deps section from a body string. */
 export function stripDepsSection(body: string): string {
-	return body.replace(/\n*<!-- seeds:deps -->[\s\S]*?<!-- \/seeds:deps -->\n*/g, "").trim();
+	return body.replace(/\n*<!-- suji:deps -->[\s\S]*?<!-- \/suji:deps -->\n*/g, "").trim();
 }
 
 /** Build a full issue body with deps section appended (strips old one first). */
-export function bodyWithDeps(description: string, issue: Issue, allIssues: Issue[], repo: string): string {
+export function bodyWithDeps(
+	description: string,
+	issue: Issue,
+	allIssues: Issue[],
+	repo: string,
+): string {
 	const clean = stripDepsSection(description);
 	const deps = buildDepsSection(issue, allIssues, repo);
 	return deps ? `${clean}\n\n${deps}` : clean;
 }
 
 /** Reopen a GitHub issue. */
-export async function ghReopen(
-	githubNumber: number,
-	repo: string,
-): Promise<boolean> {
+export async function ghReopen(githubNumber: number, repo: string): Promise<boolean> {
 	try {
-		const proc = Bun.spawn(
-			["gh", "issue", "reopen", String(githubNumber), "--repo", repo],
-			{ stdout: "pipe", stderr: "pipe" },
-		);
+		const proc = Bun.spawn(["gh", "issue", "reopen", String(githubNumber), "--repo", repo], {
+			stdout: "pipe",
+			stderr: "pipe",
+		});
 		const code = await proc.exited;
 		return code === 0;
 	} catch {

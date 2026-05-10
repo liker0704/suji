@@ -27,7 +27,7 @@ async function initSeeds(cwd: string): Promise<void> {
 }
 
 beforeEach(async () => {
-	tmpDir = await mkdtemp(join(tmpdir(), "seeds-onboard-test-"));
+	tmpDir = await mkdtemp(join(tmpdir(), "suji-onboard-test-"));
 });
 
 afterEach(async () => {
@@ -35,10 +35,10 @@ afterEach(async () => {
 });
 
 describe("sd onboard", () => {
-	test("fails without .seeds/ initialized", async () => {
+	test("fails without .suji/ initialized", async () => {
 		const { exitCode, stderr } = await run(["onboard"], tmpDir);
 		expect(exitCode).toBe(1);
-		expect(stderr).toContain("Not in a seeds project");
+		expect(stderr).toContain("Not in a suji project");
 	});
 
 	test("creates CLAUDE.md when no target file exists", async () => {
@@ -46,9 +46,9 @@ describe("sd onboard", () => {
 		const { exitCode } = await run(["onboard"], tmpDir);
 		expect(exitCode).toBe(0);
 		const content = await Bun.file(join(tmpDir, "CLAUDE.md")).text();
-		expect(content).toContain("<!-- seeds:start -->");
-		expect(content).toContain("<!-- seeds:end -->");
-		expect(content).toContain("Issue Tracking (Seeds)");
+		expect(content).toContain("<!-- suji:start -->");
+		expect(content).toContain("<!-- suji:end -->");
+		expect(content).toContain("Issue Tracking (Suji)");
 		expect(content).toContain("sd prime");
 	});
 
@@ -60,8 +60,8 @@ describe("sd onboard", () => {
 		const content = await Bun.file(join(tmpDir, "CLAUDE.md")).text();
 		expect(content).toContain("# My Project");
 		expect(content).toContain("Existing content.");
-		expect(content).toContain("<!-- seeds:start -->");
-		expect(content).toContain("Issue Tracking (Seeds)");
+		expect(content).toContain("<!-- suji:start -->");
+		expect(content).toContain("Issue Tracking (Suji)");
 	});
 
 	test("is idempotent — second onboard does not duplicate", async () => {
@@ -102,8 +102,8 @@ describe("sd onboard", () => {
 		await initSeeds(tmpDir);
 		const { stdout, exitCode } = await run(["onboard", "--stdout"], tmpDir);
 		expect(exitCode).toBe(0);
-		expect(stdout).toContain("<!-- seeds:start -->");
-		expect(stdout).toContain("Issue Tracking (Seeds)");
+		expect(stdout).toContain("<!-- suji:start -->");
+		expect(stdout).toContain("Issue Tracking (Suji)");
 		// Should not have created the file
 		const exists = await Bun.file(join(tmpDir, "CLAUDE.md")).exists();
 		expect(exists).toBe(false);
@@ -116,7 +116,7 @@ describe("sd onboard", () => {
 		const { exitCode } = await run(["onboard"], tmpDir);
 		expect(exitCode).toBe(0);
 		const content = await Bun.file(join(claudeDir, "CLAUDE.md")).text();
-		expect(content).toContain("<!-- seeds:start -->");
+		expect(content).toContain("<!-- suji:start -->");
 		// Root CLAUDE.md should NOT have been created
 		const rootExists = await Bun.file(join(tmpDir, "CLAUDE.md")).exists();
 		expect(rootExists).toBe(false);
@@ -124,17 +124,17 @@ describe("sd onboard", () => {
 
 	test("updates outdated section when version changes", async () => {
 		await initSeeds(tmpDir);
-		// Write a seeds section with an old version marker
+		// Write a suji section with an old version marker
 		const oldContent =
-			"# Project\n\n<!-- seeds:start -->\n## Old Seeds Section\n<!-- seeds-onboard-v:0 -->\nold content\n<!-- seeds:end -->\n";
+			"# Project\n\n<!-- suji:start -->\n## Old Suji Section\n<!-- suji-onboard-v:0 -->\nold content\n<!-- suji:end -->\n";
 		await Bun.write(join(tmpDir, "CLAUDE.md"), oldContent);
 		const { exitCode } = await run(["onboard"], tmpDir);
 		expect(exitCode).toBe(0);
 		const content = await Bun.file(join(tmpDir, "CLAUDE.md")).text();
 		expect(content).toContain("# Project");
-		expect(content).toContain("seeds-onboard-v:1");
-		expect(content).not.toContain("seeds-onboard-v:0");
-		expect(content).not.toContain("Old Seeds Section");
+		expect(content).toContain("suji-onboard-v:1");
+		expect(content).not.toContain("suji-onboard-v:0");
+		expect(content).not.toContain("Old Suji Section");
 	});
 
 	test("--json output on create", async () => {
@@ -150,6 +150,6 @@ describe("sd onboard", () => {
 		await initSeeds(tmpDir);
 		await run(["onboard"], tmpDir);
 		const content = await Bun.file(join(tmpDir, "CLAUDE.md")).text();
-		expect(content).toContain("seeds-onboard-v:1");
+		expect(content).toContain("suji-onboard-v:1");
 	});
 });

@@ -4,7 +4,7 @@ name: prioritize
 
 ## description
 
-Analyze all open issues across GitHub Issues and Seeds, cross-reference with codebase health, and recommend the top ~5 issues to tackle next.
+Analyze all open issues across GitHub Issues and Suji, cross-reference with codebase health, and recommend the top ~5 issues to tackle next.
 
 **Argument:** `$ARGUMENTS` — optional: a label or area to focus on (e.g., `commands`, `store`, `templates`). If empty, analyze everything.
 
@@ -17,9 +17,9 @@ Use the Task tool to spawn **three parallel agents**:
 - For each issue, capture: number, title, labels, author, creation date, body summary
 - Note any issues with community engagement (comments, thumbs-up, external authors)
 
-### Agent B: Seeds Issues
-- Run `sd list` and `sd ready`
-- For each open issue, run `sd show <id>` to get full details
+### Agent B: Suji Issues
+- Run `su list` and `su ready`
+- For each open issue, run `su show <id>` to get full details
 - Capture: id, title, type, priority, status, description, dependencies/blockers
 - Build a dependency graph: which issues block which
 
@@ -35,7 +35,7 @@ Use the Task tool to spawn **three parallel agents**:
 
 After all three agents complete:
 
-- **Deduplicate**: Match GitHub issues to Seeds issues that describe the same work (same title, overlapping description, related files)
+- **Deduplicate**: Match GitHub issues to Suji issues that describe the same work (same title, overlapping description, related files)
 - **Dependency mapping**: Identify chains — issues that must be done before others can start
 - **Cluster detection**: Group related issues that could be tackled together (same subsystem, same theme, same files)
 - **Staleness check**: Flag issues that have been open a long time with no activity
@@ -91,7 +91,7 @@ Present a final prioritized recommendation:
 
 For each recommended issue:
 - **Issue:** `<id> — <title>`
-- **Source:** GitHub #N / Seeds <id> / Both
+- **Source:** GitHub #N / Suji <id> / Both
 - **Type:** Bug / Feature / Test / Refactor / Docs
 - **Priority:** Critical / High / Medium
 - **Scope:** Small / Medium / Large — list key files

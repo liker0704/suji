@@ -2,7 +2,7 @@ import chalk from "chalk";
 import type { Command } from "commander";
 import { outputJson } from "../output.ts";
 
-const PACKAGE_NAME = "@os-eco/seeds-cli";
+const PACKAGE_NAME = "@hana/suji-cli";
 
 async function getCurrentVersion(): Promise<string> {
 	const pkgPath = new URL("../../package.json", import.meta.url);
@@ -84,7 +84,7 @@ export async function run(args: string[]): Promise<void> {
 export function register(program: Command): void {
 	program
 		.command("upgrade")
-		.description("Upgrade seeds to the latest version from npm")
+		.description("Upgrade suji to the latest version from npm")
 		.option("--check", "Check for updates without installing")
 		.option("--json", "Output as JSON")
 		.action(async (opts: { check?: boolean; json?: boolean }) => {

@@ -51,7 +51,7 @@ function checkConfig(seedsDir: string, config: { project: string } | null): Doct
 		return {
 			name: "config",
 			status: "fail",
-			message: ".seeds/ directory not found",
+			message: ".suji/ directory not found",
 			details: [],
 			fixable: false,
 		};
@@ -406,11 +406,11 @@ function checkGitattributes(seedsDir: string): DoctorCheck {
 		details.push(".gitattributes file not found");
 	} else {
 		const content = readFileSync(gitattrsPath, "utf8");
-		if (!content.includes(".seeds/issues.jsonl merge=union")) {
-			details.push("Missing: .seeds/issues.jsonl merge=union");
+		if (!content.includes(".suji/issues.jsonl merge=union")) {
+			details.push("Missing: .suji/issues.jsonl merge=union");
 		}
-		if (!content.includes(".seeds/templates.jsonl merge=union")) {
-			details.push("Missing: .seeds/templates.jsonl merge=union");
+		if (!content.includes(".suji/templates.jsonl merge=union")) {
+			details.push("Missing: .suji/templates.jsonl merge=union");
 		}
 	}
 
@@ -653,8 +653,8 @@ function fixBidirectional(seedsDir: string, fixed: string[]): void {
 function fixGitattributes(seedsDir: string, fixed: string[]): void {
 	const projectRoot = projectRootFromSeedsDir(seedsDir);
 	const gitattrsPath = join(projectRoot, ".gitattributes");
-	const issueEntry = ".seeds/issues.jsonl merge=union";
-	const tplEntry = ".seeds/templates.jsonl merge=union";
+	const issueEntry = ".suji/issues.jsonl merge=union";
+	const tplEntry = ".suji/templates.jsonl merge=union";
 
 	if (!existsSync(gitattrsPath)) {
 		writeFileSync(gitattrsPath, `${issueEntry}\n${tplEntry}\n`);
@@ -793,7 +793,7 @@ function reportResults(
 			...(fixedItems && fixedItems.length > 0 ? { fixed: fixedItems } : {}),
 		});
 	} else {
-		console.log(`\n${chalk.bold("Seeds Doctor")}\n`);
+		console.log(`\n${chalk.bold("Suji Doctor")}\n`);
 		for (const check of checks) {
 			printCheck(check, verbose);
 		}

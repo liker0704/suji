@@ -2,8 +2,8 @@
 # See: https://github.com/overstory/overstory
 
 project:
-  name: seeds
-  root: /Users/jayminwest/Projects/os-eco/seeds
+  name: suji
+  root: /Users/jayminwest/Projects/os-eco/suji
   canonicalBranch: main
   qualityGates:
     - name: Tests

@@ -87,14 +87,21 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 		try {
 			const config = await readConfig(dir);
 			if (config.github_enabled) {
-				const { ghUpdate, bodyWithDeps, detectGitHubRepo, ghIsAvailable } = await import("../github.ts");
+				const { ghUpdate, bodyWithDeps, detectGitHubRepo, ghIsAvailable } = await import(
+					"../github.ts"
+				);
 				if (await ghIsAvailable()) {
 					const repo = config.github_repo ?? (await detectGitHubRepo(process.cwd()));
 					if (repo) {
 						const updatedIssue = issues.find((i) => i.id === issueId);
 						if (updatedIssue?.githubNumber) {
 							await ghUpdate(updatedIssue.githubNumber, repo, {
-								description: bodyWithDeps(updatedIssue.description || "", updatedIssue, issues, repo),
+								description: bodyWithDeps(
+									updatedIssue.description || "",
+									updatedIssue,
+									issues,
+									repo,
+								),
 							});
 						}
 						for (const bid of removed) {

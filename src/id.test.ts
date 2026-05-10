@@ -8,8 +8,8 @@ describe("generateId", () => {
 	});
 
 	test("uses project name as prefix", () => {
-		const id = generateId("overstory", []);
-		expect(id.startsWith("overstory-")).toBe(true);
+		const id = generateId("haru", []);
+		expect(id.startsWith("haru-")).toBe(true);
 	});
 
 	test("generates different ids on repeated calls", () => {

@@ -105,7 +105,7 @@ You operate from the ecosystem root (e.g., `os-eco/`), not from any individual s
   - `ov mail reply <id> --project <path> --body "..."` (reply to a coordinator)
   - `ov status --project <path>` (check all agent states in a sub-repo)
   - `ov group status --project <path>` (check task group progress in a sub-repo)
-  - `sd show <id>`, `sd ready`, `sd list` (read issue tracker at ecosystem root)
+  - `su show <id>`, `su ready`, `su list` (read issue tracker at ecosystem root)
   - `ml prime`, `ml search`, `ml record`, `ml status` (expertise at ecosystem root)
   - `git log`, `git status`, `git diff` (read-only git inspection)
 
@@ -144,9 +144,9 @@ ov mail reply <msg-id> --project <repo-path> --body "<response>"
 
 ### Phase 1 — Analyze and Plan
 
-1. **Read the objective.** Understand what needs to happen across the ecosystem. Check issue tracker: `sd ready` for ecosystem-wide issues.
+1. **Read the objective.** Understand what needs to happen across the ecosystem. Check issue tracker: `su ready` for ecosystem-wide issues.
 2. **Load expertise** via `ml prime` at the ecosystem root.
-3. **Identify affected sub-repos.** Read the issue descriptions, trace file references, and determine which sub-repos need work. Common sub-repos in os-eco: `mulch/`, `seeds/`, `canopy/`, `overstory/`.
+3. **Identify affected sub-repos.** Read the issue descriptions, trace file references, and determine which sub-repos need work. Common sub-repos in os-eco: `mulch/`, `suji/`, `canopy/`, `overstory/`.
 4. **Group issues by repo.** Each coordinator will receive the issues relevant to its sub-repo.
 
 ### Phase 2 — Start Coordinators
@@ -232,8 +232,8 @@ When all coordinators have completed their work:
    - Which sub-repos were modified and what changed in each.
    - Any issues encountered and how they were resolved.
    - Follow-up work needed (if any).
-5. **Close ecosystem-level issues.** If you were working from ecosystem-level seeds issues:
+5. **Close ecosystem-level issues.** If you were working from ecosystem-level suji issues:
    ```bash
-   sd close <issue-id> --reason "<summary of cross-repo changes>"
+   su close <issue-id> --reason "<summary of cross-repo changes>"
    ```
 6. **Stop.** Do not start new coordinators or dispatch new work after closing.

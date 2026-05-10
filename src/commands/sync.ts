@@ -2,7 +2,7 @@ import type { Command } from "commander";
 import { findSeedsDir, isInsideWorktree, projectRootFromSeedsDir, readConfig } from "../config.ts";
 import { outputJson, printSuccess, printWarning } from "../output.ts";
 import { issuesPath, readIssues, withLock, writeIssues } from "../store.ts";
-import { SEEDS_DIR_NAME } from "../types.ts";
+import { SUJI_DIR_NAME } from "../types.ts";
 
 function spawnSync(
 	cmd: string[],
@@ -14,10 +14,10 @@ function spawnSync(
 	return { stdout, stderr, exitCode: result.exitCode ?? 0 };
 }
 
-/** Check if .seeds/ is in .gitignore. */
+/** Check if .suji/ is in .gitignore. */
 function isSeedsIgnored(projectRoot: string): boolean {
 	const result = spawnSync(
-		["git", "-C", projectRoot, "check-ignore", "-q", `${SEEDS_DIR_NAME}/`],
+		["git", "-C", projectRoot, "check-ignore", "-q", `${SUJI_DIR_NAME}/`],
 		projectRoot,
 	);
 	return result.exitCode === 0;
@@ -28,9 +28,7 @@ async function syncFromGitHub(dir: string, jsonMode: boolean): Promise<{ pulled:
 	const config = await readConfig(dir);
 	if (!config.github_enabled) return { pulled: 0 };
 
-	const { ghIsAvailable, detectGitHubRepo, ghList, ghListComments } = await import(
-		"../github.ts"
-	);
+	const { ghIsAvailable, detectGitHubRepo, ghList, ghListComments } = await import("../github.ts");
 	if (!(await ghIsAvailable())) return { pulled: 0 };
 
 	const repo = config.github_repo ?? (await detectGitHubRepo(process.cwd()));
@@ -46,32 +44,39 @@ async function syncFromGitHub(dir: string, jsonMode: boolean): Promise<{ pulled:
 		const ghIssues = await ghList(repo, { state: "all", limit: 200 });
 
 		// Auto-discover: link sd issues that don't have githubNumber yet
-		// Match by Seeds ID in GitHub issue body (`Seeds ID: \`overstory-xxxx\``)
+		// Match by Suji ID in GitHub issue body (`Suji ID: \`overstory-xxxx\``)
 		for (const ghIssue of ghIssues) {
 			// Skip if already linked to an sd issue
 			if (issues.some((i) => i.githubNumber === ghIssue.number)) continue;
 
-			// Try to find Seeds ID in body
-			const seedsIdMatch = ghIssue.body.match(/Seeds ID: `([^`]+)`/);
+			// Try to find Suji ID in body
+			const seedsIdMatch = ghIssue.body.match(/Suji ID: `([^`]+)`/);
 			if (seedsIdMatch?.[1]) {
 				const sdId = seedsIdMatch[1];
 				const idx = issues.findIndex((i) => i.id === sdId && !i.githubNumber);
 				if (idx >= 0) {
-					issues[idx] = { ...issues[idx]!, githubNumber: ghIssue.number, updatedAt: new Date().toISOString() };
+					issues[idx] = {
+						...issues[idx]!,
+						githubNumber: ghIssue.number,
+						updatedAt: new Date().toISOString(),
+					};
 					changed = true;
 					pulled++;
 					if (!jsonMode) printSuccess(`Linked: ${sdId} ↔ gh #${ghIssue.number}`);
 				}
 			} else {
 				// Fallback: match by exact title
-				const idx = issues.findIndex(
-					(i) => i.title === ghIssue.title && !i.githubNumber,
-				);
+				const idx = issues.findIndex((i) => i.title === ghIssue.title && !i.githubNumber);
 				if (idx >= 0) {
-					issues[idx] = { ...issues[idx]!, githubNumber: ghIssue.number, updatedAt: new Date().toISOString() };
+					issues[idx] = {
+						...issues[idx]!,
+						githubNumber: ghIssue.number,
+						updatedAt: new Date().toISOString(),
+					};
 					changed = true;
 					pulled++;
-					if (!jsonMode) printSuccess(`Linked (by title): ${issues[idx]!.id} ↔ gh #${ghIssue.number}`);
+					if (!jsonMode)
+						printSuccess(`Linked (by title): ${issues[idx]!.id} ↔ gh #${ghIssue.number}`);
 				}
 			}
 		}
@@ -121,9 +126,7 @@ async function syncFromGitHub(dir: string, jsonMode: boolean): Promise<{ pulled:
 					(sdIssue.comments ?? []).filter((c) => c.githubId).map((c) => c.githubId),
 				);
 				// Also track existing comment bodies to detect duplicates from sd→gh→sd round-trip
-				const existingBodies = new Set(
-					(sdIssue.comments ?? []).map((c) => c.body),
-				);
+				const existingBodies = new Set((sdIssue.comments ?? []).map((c) => c.body));
 
 				for (const ghComment of ghComments) {
 					if (existingGhIds.has(ghComment.id)) continue;
@@ -196,7 +199,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 		return;
 	}
 
-	// Check if .seeds/ is gitignored → skip git operations
+	// Check if .suji/ is gitignored → skip git operations
 	if (isSeedsIgnored(projectRoot)) {
 		if (jsonMode) {
 			outputJson({
@@ -205,19 +208,19 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 				committed: false,
 				gitignored: true,
 				ghPulled,
-				message: ".seeds/ is in .gitignore — skipping git commit",
+				message: ".suji/ is in .gitignore — skipping git commit",
 			});
 		} else {
 			if (ghPulled > 0) {
 				printSuccess(`Pulled ${ghPulled} change(s) from GitHub`);
 			}
-			console.log(".seeds/ is gitignored — skipping git commit.");
+			console.log(".suji/ is gitignored — skipping git commit.");
 		}
 		return;
 	}
 
 	const statusResult = spawnSync(
-		["git", "-C", projectRoot, "status", "--porcelain", `${SEEDS_DIR_NAME}/`],
+		["git", "-C", projectRoot, "status", "--porcelain", `${SUJI_DIR_NAME}/`],
 		projectRoot,
 	);
 
@@ -235,10 +238,10 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 		} else {
 			if (ghPulled > 0) printSuccess(`Pulled ${ghPulled} change(s) from GitHub`);
 			if (changed) {
-				console.log("Uncommitted .seeds/ changes:");
+				console.log("Uncommitted .suji/ changes:");
 				console.log(changed);
 			} else {
-				console.log("No uncommitted .seeds/ changes.");
+				console.log("No uncommitted .suji/ changes.");
 			}
 		}
 		return;
@@ -262,7 +265,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 
 	if (dryRun) {
 		const date = new Date().toISOString().slice(0, 10);
-		const msg = `seeds: sync ${date}`;
+		const msg = `suji: sync ${date}`;
 		if (jsonMode) {
 			outputJson({
 				success: true,
@@ -283,17 +286,14 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 	}
 
 	// Stage
-	const addResult = spawnSync(
-		["git", "-C", projectRoot, "add", `${SEEDS_DIR_NAME}/`],
-		projectRoot,
-	);
+	const addResult = spawnSync(["git", "-C", projectRoot, "add", `${SUJI_DIR_NAME}/`], projectRoot);
 	if (addResult.exitCode !== 0) {
 		throw new Error(`git add failed: ${addResult.stderr}`);
 	}
 
 	// Commit
 	const date = new Date().toISOString().slice(0, 10);
-	const msg = `seeds: sync ${date}`;
+	const msg = `suji: sync ${date}`;
 	const commitResult = spawnSync(["git", "-C", projectRoot, "commit", "-m", msg], projectRoot);
 	if (commitResult.exitCode !== 0) {
 		throw new Error(`git commit failed: ${commitResult.stderr}`);
@@ -310,7 +310,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 export function register(program: Command): void {
 	program
 		.command("sync")
-		.description("Sync issues: pull from GitHub + stage/commit .seeds/ changes")
+		.description("Sync issues: pull from GitHub + stage/commit .suji/ changes")
 		.option("--status", "Check status without committing")
 		.option("--dry-run", "Show what would be committed without committing")
 		.option("--json", "Output as JSON")

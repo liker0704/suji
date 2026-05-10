@@ -14,8 +14,8 @@ if (rawArgs.includes("--quiet") || rawArgs.includes("-q")) {
 const program = new Command();
 
 program
-	.name("sd")
-	.description("seeds — git-native issue tracker")
+	.name("su")
+	.description("suji — git-native issue tracker")
 	.version(VERSION, "-v, --version", "Print version")
 	.option("-q, --quiet", "Suppress non-error output")
 	.option("--verbose", "Extra diagnostic output")
@@ -26,7 +26,7 @@ program
 			if (cmd.parent) {
 				return Help.prototype.formatHelp.call(helper, cmd, helper);
 			}
-			const header = `${brand(chalk.bold("seeds"))} ${muted(`v${VERSION}`)} — Git-native issue tracking\n\nUsage: sd <command> [options]`;
+			const header = `${brand(chalk.bold("suji"))} ${muted(`v${VERSION}`)} — Git-native issue tracking\n\nUsage: su <command> [options]`;
 
 			const cmdLines: string[] = ["\nCommands:"];
 			for (const sub of cmd.commands) {
@@ -130,7 +130,7 @@ async function main(): Promise<void> {
 	if ((rawArgs.includes("-v") || rawArgs.includes("--version")) && rawArgs.includes("--json")) {
 		const platform = `${process.platform}-${process.arch}`;
 		console.log(
-			JSON.stringify({ name: "@os-eco/seeds-cli", version: VERSION, runtime: "bun", platform }),
+			JSON.stringify({ name: "@hana/suji-cli", version: VERSION, runtime: "bun", platform }),
 		);
 		process.exitCode = 0;
 		return;

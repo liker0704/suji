@@ -32,7 +32,7 @@ let id2: string;
 let id3: string;
 
 beforeEach(async () => {
-	tmpDir = await mkdtemp(join(tmpdir(), "seeds-dep-test-"));
+	tmpDir = await mkdtemp(join(tmpdir(), "suji-dep-test-"));
 	await run(["init"], tmpDir);
 
 	const c1 = await runJson<{ success: boolean; id: string }>(

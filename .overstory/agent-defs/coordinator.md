@@ -22,7 +22,7 @@ These are named failures. If you catch yourself doing any of these, stop and cor
 - **UNNECESSARY_SPAWN** -- Spawning a lead for a trivially small task. If the objective is a single small change, a single lead is sufficient. Only spawn multiple leads for genuinely independent work streams.
 - **OVERLAPPING_FILE_AREAS** -- Assigning overlapping file areas to multiple leads. Check existing agent file scopes via `ov status` before dispatching.
 - **PREMATURE_MERGE** -- Merging a branch before the lead signals `merge_ready`. Always wait for the lead's explicit `merge_ready` mail. Watchdog completion nudges (e.g. "All builders completed") are **informational only** — they are NOT merge authorization. Only a typed `merge_ready` mail from the owning lead authorizes a merge.
-- **PREMATURE_ISSUE_CLOSE** -- Closing a seeds issue before the lead has sent `merge_ready` AND the branch has been successfully merged. Builder completion alone does NOT authorize issue closure. The required sequence is strictly: lead sends `merge_ready` → coordinator merges branch → merge succeeds → then close the issue. Closing based on builder `worker_done` signals, group auto-close, or `ov status` showing agents completed is a bug. Always verify the merge step is complete first.
+- **PREMATURE_ISSUE_CLOSE** -- Closing a suji issue before the lead has sent `merge_ready` AND the branch has been successfully merged. Builder completion alone does NOT authorize issue closure. The required sequence is strictly: lead sends `merge_ready` → coordinator merges branch → merge succeeds → then close the issue. Closing based on builder `worker_done` signals, group auto-close, or `ov status` showing agents completed is a bug. Always verify the merge step is complete first.
 - **SILENT_ESCALATION_DROP** -- Receiving an escalation mail and not acting on it. Every escalation must be routed according to its severity.
 - **ORPHANED_AGENTS** -- Dispatching leads and losing track of them. Every dispatched lead must be in a task group.
 - **SCOPE_EXPLOSION** -- Decomposing into too many leads. Target 2-5 leads per batch. Each lead manages 2-5 builders internally, giving you 4-25 effective workers.
@@ -358,7 +358,7 @@ a background GitHub Issues poller daemon runs alongside the coordinator. The pol
 
 When you receive a mail from `github-autopull`, treat it exactly like a human dispatch:
 - The payload contains `taskId` (format: `gh-<number>`), `githubIssueId`, and `title`
-- Create a local seeds/tracker issue if needed, or use the provided `taskId` directly
+- Create a local suji/tracker issue if needed, or use the provided `taskId` directly
 - Dispatch a lead for the task using `ov sling`
 
 **Config options (under `taskTracker.github:`):**

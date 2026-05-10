@@ -1,4 +1,4 @@
-# Seeds
+# Suji
 
 Git-native issue tracker for AI agent workflows. Minimal dependencies, JSONL storage, Bun runtime. Replaces beads in the overstory/mulch ecosystem.
 
@@ -18,7 +18,7 @@ Git-native issue tracker for AI agent workflows. Minimal dependencies, JSONL sto
 ## Directory Structure
 
 ```
-seeds/
+suji/
   package.json
   tsconfig.json
   biome.json
@@ -44,27 +44,27 @@ seeds/
     yaml.ts                   # Minimal YAML parser (flat key-value only)
     markers.ts                # Marker-delimited section helpers (onboard)
     commands/
-      init.ts                 # sd init
-      create.ts               # sd create
-      show.ts                 # sd show
-      list.ts                 # sd list
-      ready.ts                # sd ready
-      update.ts               # sd update
-      close.ts                # sd close
-      dep.ts                  # sd dep add/remove/list
-      block.ts                # sd block
-      unblock.ts              # sd unblock
-      label.ts                # sd label add/remove/list/list-all
-      sync.ts                 # sd sync
-      blocked.ts              # sd blocked
-      stats.ts                # sd stats
-      tpl.ts                  # sd tpl create/step/list/show/pour/status
-      migrate.ts              # sd migrate-from-beads
-      doctor.ts               # sd doctor
-      prime.ts                # sd prime
-      onboard.ts              # sd onboard
-      upgrade.ts              # sd upgrade
-      completions.ts          # sd completions
+      init.ts                 # su init
+      create.ts               # su create
+      show.ts                 # su show
+      list.ts                 # su list
+      ready.ts                # su ready
+      update.ts               # su update
+      close.ts                # su close
+      dep.ts                  # su dep add/remove/list
+      block.ts                # su block
+      unblock.ts              # su unblock
+      label.ts                # su label add/remove/list/list-all
+      sync.ts                 # su sync
+      blocked.ts              # su blocked
+      stats.ts                # su stats
+      tpl.ts                  # su tpl create/step/list/show/pour/status
+      migrate.ts              # su migrate-from-beads
+      doctor.ts               # su doctor
+      prime.ts                # su prime
+      onboard.ts              # su onboard
+      upgrade.ts              # su upgrade
+      completions.ts          # su completions
     markers.test.ts           # Marker section tests
     store.test.ts             # Core data layer tests
     id.test.ts                # ID generation tests
@@ -102,10 +102,10 @@ Run all three before committing:
 bun test && bun run lint && bun run typecheck
 ```
 
-## On-Disk Format (.seeds/)
+## On-Disk Format (.suji/)
 
 ```
-.seeds/
+.suji/
   config.yaml          # Project config (YAML)
   issues.jsonl         # All issues, one JSON object per line
   templates.jsonl      # Molecule/template definitions
@@ -116,66 +116,66 @@ Git merge strategy: `merge=union` gitattribute on JSONL files. Dedup-on-read (la
 
 ## CLI Command Reference
 
-Binary name: `sd`
+Binary name: `su`
 
 Every command supports `--json` for structured output. Global flags: `-v`, `-q`/`--quiet`, `--verbose`, `--timing`.
 
 ### Issue Commands
 
 ```
-sd init                                Initialize .seeds/ in current directory
-sd create --title <text>               Create a new issue
+su init                                Initialize .suji/ in current directory
+su create --title <text>               Create a new issue
   --type task|bug|feature|epic         (default: task)
   --priority 0-4 or P0-P4             (default: 2)
   --description <text>
   --assignee <name>
-sd show <id>                           Show issue details
-sd list                                List issues with filters
+su show <id>                           Show issue details
+su list                                List issues with filters
   --status --type --assignee --limit
   --label <label>                      Filter by label
   --all                                Include closed issues
-sd ready                               Open issues with no unresolved blockers
-sd update <id>                         Update issue fields
-sd close <id> [<id2> ...]              Close one or more issues
+su ready                               Open issues with no unresolved blockers
+su update <id>                         Update issue fields
+su close <id> [<id2> ...]              Close one or more issues
   --reason <text>
-sd dep add <issue> <depends-on>        Add dependency
-sd dep remove <issue> <depends-on>     Remove dependency
-sd dep list <issue>                    Show deps for an issue
-sd block <id> --by <blocker-id>        Mark issue as blocked
-sd unblock <id> --from <blocker-id>    Remove blocker (--all to clear all)
-sd blocked                             Show all blocked issues
-sd label add <id> <label>              Add label to issue
-sd label remove <id> <label>           Remove label from issue
-sd label list <id>                     List labels on issue
-sd label list-all                      List all labels across issues
-sd stats                               Project statistics
-sd sync                                Stage and commit .seeds/ changes
+su dep add <issue> <depends-on>        Add dependency
+su dep remove <issue> <depends-on>     Remove dependency
+su dep list <issue>                    Show deps for an issue
+su block <id> --by <blocker-id>        Mark issue as blocked
+su unblock <id> --from <blocker-id>    Remove blocker (--all to clear all)
+su blocked                             Show all blocked issues
+su label add <id> <label>              Add label to issue
+su label remove <id> <label>           Remove label from issue
+su label list <id>                     List labels on issue
+su label list-all                      List all labels across issues
+su stats                               Project statistics
+su sync                                Stage and commit .suji/ changes
   --status                             Check without committing
   --dry-run                            Show what would be committed
-sd doctor                              Check project health and data integrity
+su doctor                              Check project health and data integrity
   --fix                                Fix auto-fixable issues
 ```
 
 ### Agent Integration Commands
 
 ```
-sd prime                               Output AI agent context
+su prime                               Output AI agent context
   --compact                            Condensed quick-reference output
-sd onboard                             Add seeds section to CLAUDE.md / AGENTS.md
-sd upgrade                             Upgrade seeds to latest version from npm
+su onboard                             Add suji section to CLAUDE.md / AGENTS.md
+su upgrade                             Upgrade suji to latest version from npm
   --check                              Check for updates without installing
-sd completions <shell>                 Output shell completion script (bash, zsh, fish)
+su completions <shell>                 Output shell completion script (bash, zsh, fish)
 ```
 
 ### Template (Molecule) Commands
 
 ```
-sd tpl create --name <text>            Create a template
-sd tpl step add <id> --title <text>    Add step to template
-sd tpl list                            List all templates
-sd tpl show <id>                       Show template with steps
-sd tpl pour <id> --prefix <text>       Instantiate template into issues
-sd tpl status <id>                     Show convoy status
+su tpl create --name <text>            Create a template
+su tpl step add <id> --title <text>    Add step to template
+su tpl list                            List all templates
+su tpl show <id>                       Show template with steps
+su tpl pour <id> --prefix <text>       Instantiate template into issues
+su tpl status <id>                     Show convoy status
 ```
 
 ## Coding Conventions
@@ -265,7 +265,7 @@ When ending a work session, you MUST complete ALL steps below. Work is NOT compl
 4. **Push to remote** (MANDATORY):
    ```bash
    git pull --rebase
-   sd sync
+   su sync
    git push
    git status  # MUST show "up to date with origin"
    ```
@@ -311,31 +311,31 @@ Run `mulch --help` for full usage.
    ```
 <!-- mulch:end -->
 
-<!-- seeds:start -->
-## Issue Tracking (Seeds)
-<!-- seeds-onboard-v:1 -->
+<!-- suji:start -->
+## Issue Tracking (Suji)
+<!-- suji-onboard-v:1 -->
 
-This project uses [Seeds](https://github.com/jayminwest/seeds) for git-native issue tracking.
+This project uses [Suji](https://github.com/jayminwest/seeds) for git-native issue tracking.
 
 **At the start of every session**, run:
 ```
-sd prime
+su prime
 ```
 
 This injects session context: rules, command reference, and workflows.
 
 **Quick reference:**
-- `sd ready` — Find unblocked work
-- `sd create --title "..." --type task --priority 2` — Create issue
-- `sd update <id> --status in_progress` — Claim work
-- `sd close <id>` — Complete work
-- `sd sync` — Sync with git (run before pushing)
+- `su ready` — Find unblocked work
+- `su create --title "..." --type task --priority 2` — Create issue
+- `su update <id> --status in_progress` — Claim work
+- `su close <id>` — Complete work
+- `su sync` — Sync with git (run before pushing)
 
 ### Before You Finish
-1. Close completed issues: `sd close <id>`
-2. File issues for remaining work: `sd create --title "..."`
-3. Sync and push: `sd sync && git push`
-<!-- seeds:end -->
+1. Close completed issues: `su close <id>`
+2. File issues for remaining work: `su create --title "..."`
+3. Sync and push: `su sync && git push`
+<!-- suji:end -->
 
 <!-- canopy:start -->
 ## Prompt Management (Canopy)

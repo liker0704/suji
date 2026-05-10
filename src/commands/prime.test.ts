@@ -27,7 +27,7 @@ async function initSeeds(cwd: string): Promise<void> {
 }
 
 beforeEach(async () => {
-	tmpDir = await mkdtemp(join(tmpdir(), "seeds-prime-test-"));
+	tmpDir = await mkdtemp(join(tmpdir(), "suji-prime-test-"));
 });
 
 afterEach(async () => {
@@ -35,10 +35,10 @@ afterEach(async () => {
 });
 
 describe("sd prime", () => {
-	test("outputs full prime content without .seeds/ initialized", async () => {
+	test("outputs full prime content without .suji/ initialized", async () => {
 		const { stdout, exitCode } = await run(["prime"], tmpDir);
 		expect(exitCode).toBe(0);
-		expect(stdout).toContain("Seeds Workflow Context");
+		expect(stdout).toContain("Suji Workflow Context");
 		expect(stdout).toContain("Session Close Protocol");
 		expect(stdout).toContain("sd ready");
 	});
@@ -46,7 +46,7 @@ describe("sd prime", () => {
 	test("outputs compact content with --compact", async () => {
 		const { stdout, exitCode } = await run(["prime", "--compact"], tmpDir);
 		expect(exitCode).toBe(0);
-		expect(stdout).toContain("Seeds Quick Reference");
+		expect(stdout).toContain("Suji Quick Reference");
 		expect(stdout).not.toContain("Session Close Protocol");
 	});
 
@@ -56,21 +56,21 @@ describe("sd prime", () => {
 		const result = JSON.parse(stdout) as { success: boolean; command: string; content: string };
 		expect(result.success).toBe(true);
 		expect(result.command).toBe("prime");
-		expect(result.content).toContain("Seeds Workflow Context");
+		expect(result.content).toContain("Suji Workflow Context");
 	});
 
 	test("--export outputs default template even with custom PRIME.md", async () => {
 		await initSeeds(tmpDir);
-		await Bun.write(join(tmpDir, ".seeds", "PRIME.md"), "custom prime content");
+		await Bun.write(join(tmpDir, ".suji", "PRIME.md"), "custom prime content");
 		const { stdout, exitCode } = await run(["prime", "--export"], tmpDir);
 		expect(exitCode).toBe(0);
-		expect(stdout).toContain("Seeds Workflow Context");
+		expect(stdout).toContain("Suji Workflow Context");
 		expect(stdout).not.toContain("custom prime content");
 	});
 
 	test("uses custom PRIME.md when present", async () => {
 		await initSeeds(tmpDir);
-		await Bun.write(join(tmpDir, ".seeds", "PRIME.md"), "my custom agent context");
+		await Bun.write(join(tmpDir, ".suji", "PRIME.md"), "my custom agent context");
 		const { stdout, exitCode } = await run(["prime"], tmpDir);
 		expect(exitCode).toBe(0);
 		expect(stdout).toBe("my custom agent context");
@@ -89,6 +89,6 @@ describe("sd prime", () => {
 		expect(exitCode).toBe(0);
 		const result = JSON.parse(stdout) as { success: boolean; content: string };
 		expect(result.success).toBe(true);
-		expect(result.content).toContain("Seeds Workflow Context");
+		expect(result.content).toContain("Suji Workflow Context");
 	});
 });

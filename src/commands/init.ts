@@ -2,9 +2,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import type { Command } from "commander";
 import { outputJson, printSuccess } from "../output.ts";
-import { CONFIG_FILE, ISSUES_FILE, SEEDS_DIR_NAME, TEMPLATES_FILE } from "../types.ts";
+import { CONFIG_FILE, ISSUES_FILE, SUJI_DIR_NAME, TEMPLATES_FILE } from "../types.ts";
 
-/** Seeds label definitions that map to GitHub labels. */
+/** Suji label definitions that map to GitHub labels. */
 const SEEDS_LABELS = [
 	{ name: "type:task", color: "0075ca", description: "Task" },
 	{ name: "type:bug", color: "d73a4a", description: "Bug report" },
@@ -41,7 +41,7 @@ async function setupGitHub(cwd: string, seedsDir: string, autoYes: boolean): Pro
 	if (!autoYes) {
 		process.stdout.write(`\n  GitHub repo detected: ${repo}\n`);
 		process.stdout.write("  This will:\n");
-		process.stdout.write("    1. Create seeds labels on GitHub (type:task, priority:0, etc.)\n");
+		process.stdout.write("    1. Create suji labels on GitHub (type:task, priority:0, etc.)\n");
 		process.stdout.write("    2. Enable automatic issue sync (sd create → gh issue create)\n");
 		process.stdout.write(`\n  Continue? [y/N] `);
 
@@ -67,10 +67,16 @@ async function setupGitHub(cwd: string, seedsDir: string, autoYes: boolean): Pro
 	for (const label of SEEDS_LABELS) {
 		const proc = Bun.spawn(
 			[
-				"gh", "label", "create", label.name,
-				"--repo", repo,
-				"--color", label.color,
-				"--description", label.description,
+				"gh",
+				"label",
+				"create",
+				label.name,
+				"--repo",
+				repo,
+				"--color",
+				label.color,
+				"--description",
+				label.description,
 				"--force",
 			],
 			{ stdout: "pipe", stderr: "pipe" },
@@ -95,7 +101,7 @@ export async function run(args: string[]): Promise<void> {
 	const githubMode = args.includes("--github");
 	const autoYes = args.includes("--yes") || args.includes("-y");
 	const cwd = process.cwd();
-	const seedsDir = join(cwd, SEEDS_DIR_NAME);
+	const seedsDir = join(cwd, SUJI_DIR_NAME);
 
 	const alreadyExists = existsSync(join(seedsDir, CONFIG_FILE));
 
@@ -119,15 +125,15 @@ export async function run(args: string[]): Promise<void> {
 		writeFileSync(join(seedsDir, ISSUES_FILE), "");
 		writeFileSync(join(seedsDir, TEMPLATES_FILE), "");
 
-		// .gitignore inside .seeds/
+		// .gitignore inside .suji/
 		writeFileSync(join(seedsDir, ".gitignore"), "*.lock\n");
 
 		// Append .gitattributes to project root
 		const gitattrsPath = join(cwd, ".gitattributes");
-		const entry = ".seeds/issues.jsonl merge=union\n.seeds/templates.jsonl merge=union\n";
+		const entry = ".suji/issues.jsonl merge=union\n.suji/templates.jsonl merge=union\n";
 		if (existsSync(gitattrsPath)) {
 			const existing = readFileSync(gitattrsPath, "utf8");
-			if (!existing.includes(".seeds/issues.jsonl")) {
+			if (!existing.includes(".suji/issues.jsonl")) {
 				writeFileSync(gitattrsPath, `${existing}\n${entry}`);
 			}
 		} else {
@@ -135,7 +141,7 @@ export async function run(args: string[]): Promise<void> {
 		}
 
 		if (!jsonMode) {
-			printSuccess(`Initialized .seeds/ in ${cwd}`);
+			printSuccess(`Initialized .suji/ in ${cwd}`);
 		}
 	}
 
@@ -155,7 +161,7 @@ export async function run(args: string[]): Promise<void> {
 export function register(program: Command): void {
 	program
 		.command("init")
-		.description("Initialize .seeds/ in current directory")
+		.description("Initialize .suji/ in current directory")
 		.option("--github", "Set up GitHub issue sync (creates labels, enables mirroring)")
 		.option("-y, --yes", "Auto-accept all prompts")
 		.option("--json", "Output as JSON")

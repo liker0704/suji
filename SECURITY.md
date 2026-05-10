@@ -29,23 +29,23 @@ We will keep you informed of progress throughout the process.
 
 ## Scope
 
-Seeds is a CLI tool that reads and writes files on the local filesystem. The following are considered security issues:
+Suji is a CLI tool that reads and writes files on the local filesystem. The following are considered security issues:
 
 - **Command injection** -- Unsanitized input passed to shell execution
-- **Path traversal** -- Accessing files outside the intended `.seeds/` directory
+- **Path traversal** -- Accessing files outside the intended `.suji/` directory
 - **Arbitrary file access** -- Reading or writing files the user did not intend
 - **Symlink attacks** -- Following symlinks to unintended locations
 - **Temp file races** -- TOCTOU vulnerabilities in temporary file handling
 
 The following are generally **not** in scope:
 
-- Denial of service via large input files (Seeds is a local tool, not a service)
+- Denial of service via large input files (Suji is a local tool, not a service)
 - Issues that require the attacker to already have local shell access with the same privileges as the user
 - Social engineering or phishing
 
 ## Security Measures
 
-Seeds already implements several hardening measures:
+Suji already implements several hardening measures:
 
 - Atomic writes via temp file + rename to prevent partial/corrupt files
 - Advisory file locking to prevent concurrent write corruption

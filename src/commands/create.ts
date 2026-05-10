@@ -111,7 +111,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 			try {
 				const { ghCreate, detectGitHubRepo, ghIsAvailable } = await import("../github.ts");
 				if (await ghIsAvailable()) {
-					const repo = config.github_repo ?? await detectGitHubRepo(process.cwd());
+					const repo = config.github_repo ?? (await detectGitHubRepo(process.cwd()));
 					if (repo) {
 						const allIssues = await readIssues(dir);
 						const ghNumber = await ghCreate(issue, repo, allIssues);

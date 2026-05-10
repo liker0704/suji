@@ -59,7 +59,7 @@ export interface ConvoyStatus {
 	issues: string[];
 }
 
-export const SEEDS_DIR_NAME = ".seeds";
+export const SUJI_DIR_NAME = ".suji";
 export const ISSUES_FILE = "issues.jsonl";
 export const TEMPLATES_FILE = "templates.jsonl";
 export const CONFIG_FILE = "config.yaml";

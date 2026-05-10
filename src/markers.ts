@@ -1,5 +1,5 @@
-export const START_MARKER = "<!-- seeds:start -->";
-export const END_MARKER = "<!-- seeds:end -->";
+export const START_MARKER = "<!-- suji:start -->";
+export const END_MARKER = "<!-- suji:end -->";
 
 export function hasMarkerSection(content: string): boolean {
 	return content.includes(START_MARKER) && content.includes(END_MARKER);
