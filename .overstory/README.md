@@ -6,13 +6,13 @@ Overstory turns a single Claude Code session into a multi-agent team by spawning
 
 ## Key Commands
 
-- `overstory init`          — Initialize this directory
-- `overstory status`        — Show active agents and state
-- `overstory sling <id>`    — Spawn a worker agent
-- `overstory mail check`    — Check agent messages
-- `overstory merge`         — Merge agent work back
-- `overstory dashboard`     — Live TUI monitoring
-- `overstory doctor`        — Run health checks
+- `ov init`          — Initialize this directory
+- `ov status`        — Show active agents and state
+- `ov sling <id>`    — Spawn a worker agent
+- `ov mail check`    — Check agent messages
+- `ov merge`         — Merge agent work back
+- `ov dashboard`     — Live TUI monitoring
+- `ov doctor`        — Run health checks
 
 ## Structure
 

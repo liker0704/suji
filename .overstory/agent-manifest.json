@@ -114,8 +114,154 @@
 				"no-worktree"
 			]
 		},
-		"supervisor": {
-			"file": "supervisor.md",
+		"coordinator-mission": {
+			"file": "coordinator-mission-full.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"coordinate",
+				"dispatch",
+				"escalate",
+				"mission"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"coordinator-mission-assess": {
+			"file": "coordinator-mission-assess.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"coordinate",
+				"assess",
+				"mission"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"coordinator-mission-direct": {
+			"file": "coordinator-mission-direct.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"coordinate",
+				"dispatch",
+				"escalate",
+				"mission"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"coordinator-mission-planned": {
+			"file": "coordinator-mission-planned.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"coordinate",
+				"dispatch",
+				"escalate",
+				"mission"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"mission-analyst": {
+			"file": "mission-analyst.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"research",
+				"analyze",
+				"synthesize",
+				"mission"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"mission-analyst-planned": {
+			"file": "mission-analyst-planned.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"research",
+				"analyze",
+				"synthesize",
+				"mission"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"execution-director": {
+			"file": "execution-director.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"dispatch",
+				"coordinate",
+				"execute",
+				"mission"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"lead-mission": {
+			"file": "lead-mission.md",
 			"model": "opus",
 			"tools": [
 				"Read",
@@ -128,10 +274,132 @@
 			],
 			"capabilities": [
 				"coordinate",
-				"supervise"
+				"implement",
+				"review",
+				"mission-workstream"
 			],
 			"canSpawn": true,
 			"constraints": []
+		},
+		"plan-review-lead": {
+			"file": "plan-review-lead.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"coordinate",
+				"plan-review"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"plan-devil-advocate": {
+			"file": "plan-devil-advocate.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"plan-critic",
+				"plan-risk"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"plan-security-critic": {
+			"file": "plan-security-critic.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"plan-critic",
+				"security"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"plan-performance-critic": {
+			"file": "plan-performance-critic.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"plan-critic",
+				"performance"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"plan-second-opinion": {
+			"file": "plan-second-opinion.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"plan-critic",
+				"independent-validation"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"plan-simulator": {
+			"file": "plan-simulator.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"plan-critic",
+				"simulation"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
 		},
 		"monitor": {
 			"file": "monitor.md",
@@ -151,6 +419,139 @@
 				"read-only",
 				"no-worktree"
 			]
+		},
+		"research-lead": {
+			"file": "research-lead.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Write",
+				"Glob",
+				"Grep",
+				"Bash",
+				"Agent"
+			],
+			"capabilities": [
+				"research-lead"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"no-worktree"
+			]
+		},
+		"researcher": {
+			"file": "researcher.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash",
+				"mcp"
+			],
+			"capabilities": [
+				"researcher"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only"
+			]
+		},
+		"architect": {
+			"file": "architect.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash",
+				"Write"
+			],
+			"capabilities": [
+				"architect",
+				"design"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"no-worktree"
+			]
+		},
+		"tester": {
+			"file": "tester.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash",
+				"Write",
+				"Edit"
+			],
+			"capabilities": [
+				"tester",
+				"test-write"
+			],
+			"canSpawn": false,
+			"constraints": []
+		},
+		"architecture-review-lead": {
+			"file": "architecture-review-lead.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"coordinate",
+				"architecture-review"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"plan-architecture-critic": {
+			"file": "plan-architecture-critic.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"review",
+				"plan-critic",
+				"architecture"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"architecture-sync": {
+			"file": "architecture-sync.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"architecture-sync",
+				"knowledge-extraction"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
 		}
 	},
 	"capabilityIndex": {
@@ -158,11 +559,14 @@
 			"scout"
 		],
 		"research": [
-			"scout"
+			"scout",
+			"mission-analyst",
+			"mission-analyst-planned"
 		],
 		"implement": [
 			"builder",
-			"lead"
+			"lead",
+			"lead-mission"
 		],
 		"refactor": [
 			"builder"
@@ -172,7 +576,16 @@
 		],
 		"review": [
 			"reviewer",
-			"lead"
+			"lead",
+			"lead-mission",
+			"plan-review-lead",
+			"plan-devil-advocate",
+			"plan-security-critic",
+			"plan-performance-critic",
+			"plan-second-opinion",
+			"plan-simulator",
+			"architecture-review-lead",
+			"plan-architecture-critic"
 		],
 		"validate": [
 			"reviewer"
@@ -180,7 +593,14 @@
 		"coordinate": [
 			"lead",
 			"coordinator",
-			"supervisor"
+			"coordinator-mission",
+			"coordinator-mission-assess",
+			"coordinator-mission-direct",
+			"coordinator-mission-planned",
+			"execution-director",
+			"lead-mission",
+			"plan-review-lead",
+			"architecture-review-lead"
 		],
 		"merge": [
 			"merger"
@@ -189,19 +609,105 @@
 			"merger"
 		],
 		"dispatch": [
-			"coordinator"
+			"coordinator",
+			"coordinator-mission",
+			"coordinator-mission-direct",
+			"coordinator-mission-planned",
+			"execution-director"
 		],
 		"escalate": [
-			"coordinator"
+			"coordinator",
+			"coordinator-mission",
+			"coordinator-mission-direct",
+			"coordinator-mission-planned"
 		],
-		"supervise": [
-			"supervisor"
+		"mission": [
+			"coordinator-mission",
+			"coordinator-mission-assess",
+			"coordinator-mission-direct",
+			"coordinator-mission-planned",
+			"mission-analyst",
+			"mission-analyst-planned",
+			"execution-director"
+		],
+		"assess": [
+			"coordinator-mission-assess"
+		],
+		"analyze": [
+			"mission-analyst",
+			"mission-analyst-planned"
+		],
+		"synthesize": [
+			"mission-analyst",
+			"mission-analyst-planned"
+		],
+		"execute": [
+			"execution-director"
+		],
+		"mission-workstream": [
+			"lead-mission"
+		],
+		"plan-review": [
+			"plan-review-lead"
+		],
+		"plan-critic": [
+			"plan-devil-advocate",
+			"plan-security-critic",
+			"plan-performance-critic",
+			"plan-second-opinion",
+			"plan-simulator",
+			"plan-architecture-critic"
+		],
+		"plan-risk": [
+			"plan-devil-advocate"
+		],
+		"security": [
+			"plan-security-critic"
+		],
+		"performance": [
+			"plan-performance-critic"
+		],
+		"independent-validation": [
+			"plan-second-opinion"
+		],
+		"simulation": [
+			"plan-simulator"
 		],
 		"monitor": [
 			"monitor"
 		],
 		"patrol": [
 			"monitor"
+		],
+		"research-lead": [
+			"research-lead"
+		],
+		"researcher": [
+			"researcher"
+		],
+		"architect": [
+			"architect"
+		],
+		"design": [
+			"architect"
+		],
+		"tester": [
+			"tester"
+		],
+		"test-write": [
+			"tester"
+		],
+		"architecture-review": [
+			"architecture-review-lead"
+		],
+		"architecture": [
+			"plan-architecture-critic"
+		],
+		"architecture-sync": [
+			"architecture-sync"
+		],
+		"knowledge-extraction": [
+			"architecture-sync"
 		]
 	}
 }

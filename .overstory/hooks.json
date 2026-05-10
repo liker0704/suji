@@ -6,7 +6,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "overstory prime --agent orchestrator"
+						"command": "ov prime --agent orchestrator"
 					}
 				]
 			}
@@ -17,7 +17,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "overstory mail check --inject --agent orchestrator"
+						"command": "ov mail check --inject --agent orchestrator"
 					}
 				]
 			}
@@ -37,7 +37,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "read -r INPUT; TOOL_NAME=$(echo \"$INPUT\" | sed 's/.*\"tool_name\": *\"\\([^\"]*\\)\".*/\\1/'); overstory log tool-start --agent orchestrator --tool-name \"$TOOL_NAME\""
+						"command": "read -r INPUT; TOOL_NAME=$(echo \"$INPUT\" | sed 's/.*\"tool_name\": *\"\\([^\"]*\\)\".*/\\1/'); ov log tool-start --agent orchestrator --tool-name \"$TOOL_NAME\""
 					}
 				]
 			}
@@ -48,7 +48,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "read -r INPUT; TOOL_NAME=$(echo \"$INPUT\" | sed 's/.*\"tool_name\": *\"\\([^\"]*\\)\".*/\\1/'); overstory log tool-end --agent orchestrator --tool-name \"$TOOL_NAME\""
+						"command": "read -r INPUT; TOOL_NAME=$(echo \"$INPUT\" | sed 's/.*\"tool_name\": *\"\\([^\"]*\\)\".*/\\1/'); ov log tool-end --agent orchestrator --tool-name \"$TOOL_NAME\""
 					}
 				]
 			},
@@ -68,7 +68,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "overstory log session-end --agent orchestrator"
+						"command": "ov log session-end --agent orchestrator"
 					},
 					{
 						"type": "command",
@@ -83,7 +83,7 @@
 				"hooks": [
 					{
 						"type": "command",
-						"command": "overstory prime --agent orchestrator --compact"
+						"command": "ov prime --agent orchestrator --compact"
 					}
 				]
 			}
