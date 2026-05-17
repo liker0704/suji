@@ -164,10 +164,97 @@ async function syncFromGitHub(dir: string, jsonMode: boolean): Promise<{ pulled:
 	return { pulled };
 }
 
+type PushResult = { pushed: number; failed: number; orphaned: number };
+
+async function pushToGitHub(
+	dir: string,
+	jsonMode: boolean,
+	dryRun: boolean,
+): Promise<PushResult | null> {
+	const config = await readConfig(dir);
+	if (!config.github_enabled) return null;
+
+	const initial = await readIssues(dir);
+	const candidates = initial.filter((i) => i.status === "open" && !i.githubNumber);
+
+	// DRY-RUN: report and return BEFORE any gh interaction (Design decision #4).
+	// Always reachable when github_enabled, regardless of gh auth.
+	if (dryRun) {
+		if (!jsonMode) {
+			for (const c of candidates) console.log(`Would push: ${c.id} — ${c.title}`);
+		}
+		return { pushed: candidates.length, failed: 0, orphaned: 0 };
+	}
+
+	// Live path: requires gh + repo. Both short-circuits return null (did not run).
+	const { ghIsAvailable, detectGitHubRepo, ghCreate } = await import("../github.ts");
+	if (!(await ghIsAvailable())) return null;
+	const repo = config.github_repo ?? (await detectGitHubRepo(process.cwd()));
+	if (!repo) return null;
+
+	let pushed = 0;
+	let failed = 0;
+	let orphaned = 0;
+
+	for (const candidate of candidates) {
+		try {
+			// Phase 1: network call OUTSIDE the lock. Do not hold lock across network call.
+			const allIssues = await readIssues(dir);
+			const ghNumber = await ghCreate(candidate, repo, allIssues);
+			if (!ghNumber) {
+				failed++;
+				if (!jsonMode) printWarning(`Push failed: ${candidate.id}`);
+				continue;
+			}
+
+			// Phase 2: writeback INSIDE the lock — re-check to defend concurrent push race.
+			let wroteSuccessfully = false;
+			let orphanedThisIteration = false;
+			await withLock(issuesPath(dir), async () => {
+				const issues = await readIssues(dir);
+				const idx = issues.findIndex((i) => i.id === candidate.id);
+				if (idx < 0) {
+					orphanedThisIteration = true;
+					return;
+				}
+				if (issues[idx]?.githubNumber) {
+					orphanedThisIteration = true;
+					if (!jsonMode)
+						printWarning(
+							`Race: ${candidate.id} already has gh #${issues[idx]?.githubNumber}; ` +
+								`gh #${ghNumber} created by this process is now orphaned.`,
+						);
+					return;
+				}
+				issues[idx] = {
+					...issues[idx]!,
+					githubNumber: ghNumber,
+					updatedAt: new Date().toISOString(),
+				};
+				await writeIssues(dir, issues);
+				wroteSuccessfully = true;
+			});
+
+			if (wroteSuccessfully) {
+				pushed++;
+				if (!jsonMode) printSuccess(`Pushed: ${candidate.id} → gh #${ghNumber}`);
+			} else if (orphanedThisIteration) {
+				orphaned++;
+			}
+		} catch (err) {
+			failed++;
+			if (!jsonMode) printWarning(`Push error: ${candidate.id}: ${err}`);
+		}
+	}
+
+	return { pushed, failed, orphaned };
+}
+
 export async function run(args: string[], seedsDir?: string): Promise<void> {
 	const jsonMode = args.includes("--json");
 	const statusOnly = args.includes("--status");
 	const dryRun = args.includes("--dry-run");
+	const push = args.includes("--push");
 
 	const dir = seedsDir ?? (await findSeedsDir());
 	const projectRoot = projectRootFromSeedsDir(dir);
@@ -181,6 +268,22 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 		// Non-fatal: GitHub sync failure doesn't block local sync
 	}
 
+	// GitHub push: push local-only open issues to GitHub
+	const effectiveDryRun = dryRun || statusOnly;
+	const pushResult = push ? await pushToGitHub(dir, jsonMode, effectiveDryRun) : null;
+	if (pushResult && pushResult.failed > 0) {
+		process.exitCode = 1;
+	}
+
+	const pushKeys =
+		pushResult !== null
+			? {
+					pushed: pushResult.pushed,
+					pushFailed: pushResult.failed,
+					pushOrphaned: pushResult.orphaned,
+				}
+			: {};
+
 	// Worktree guard: skip commit when running from a worktree
 	if (!seedsDir && isInsideWorktree(process.cwd())) {
 		const msg = "Inside a git worktree — skipping commit. Issues are stored in the main repo.";
@@ -191,6 +294,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 				committed: false,
 				worktree: true,
 				ghPulled,
+				...pushKeys,
 				message: msg,
 			});
 		} else {
@@ -208,6 +312,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 				committed: false,
 				gitignored: true,
 				ghPulled,
+				...pushKeys,
 				message: ".suji/ is in .gitignore — skipping git commit",
 			});
 		} else {
@@ -234,6 +339,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 				hasChanges: !!changed,
 				changes: changed,
 				ghPulled,
+				...pushKeys,
 			});
 		} else {
 			if (ghPulled > 0) printSuccess(`Pulled ${ghPulled} change(s) from GitHub`);
@@ -254,6 +360,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 				command: "sync",
 				committed: false,
 				ghPulled,
+				...pushKeys,
 				message: "Nothing to commit",
 			});
 		} else {
@@ -273,6 +380,7 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 				dryRun: true,
 				wouldCommit: true,
 				ghPulled,
+				...pushKeys,
 				message: msg,
 				changes: changed,
 			});
@@ -300,7 +408,14 @@ export async function run(args: string[], seedsDir?: string): Promise<void> {
 	}
 
 	if (jsonMode) {
-		outputJson({ success: true, command: "sync", committed: true, ghPulled, message: msg });
+		outputJson({
+			success: true,
+			command: "sync",
+			committed: true,
+			ghPulled,
+			...pushKeys,
+			message: msg,
+		});
 	} else {
 		if (ghPulled > 0) printSuccess(`Pulled ${ghPulled} change(s) from GitHub`);
 		console.log(`Committed: ${msg}`);
@@ -313,12 +428,16 @@ export function register(program: Command): void {
 		.description("Sync issues: pull from GitHub + stage/commit .suji/ changes")
 		.option("--status", "Check status without committing")
 		.option("--dry-run", "Show what would be committed without committing")
+		.option("--push", "Also push local-only open issues to GitHub")
 		.option("--json", "Output as JSON")
-		.action(async (opts: { status?: boolean; dryRun?: boolean; json?: boolean }) => {
-			const args: string[] = [];
-			if (opts.status) args.push("--status");
-			if (opts.dryRun) args.push("--dry-run");
-			if (opts.json) args.push("--json");
-			await run(args);
-		});
+		.action(
+			async (opts: { status?: boolean; dryRun?: boolean; push?: boolean; json?: boolean }) => {
+				const args: string[] = [];
+				if (opts.status) args.push("--status");
+				if (opts.dryRun) args.push("--dry-run");
+				if (opts.push) args.push("--push");
+				if (opts.json) args.push("--json");
+				await run(args);
+			},
+		);
 }

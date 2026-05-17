@@ -113,7 +113,7 @@ export async function ghCreate(
 	allIssues?: Issue[],
 ): Promise<number | null> {
 	try {
-		const bodyParts = [issue.description || "", "", `_Seeds ID: \`${issue.id}\`_`];
+		const bodyParts = [issue.description || "", "", `Suji ID: \`${issue.id}\``];
 
 		// Add dependency section if issue has blocks/blockedBy
 		if (allIssues) {
@@ -131,6 +131,7 @@ export async function ghCreate(
 		const labels: string[] = [];
 		if (issue.type) labels.push(`type:${issue.type}`);
 		if (issue.priority !== undefined) labels.push(`priority:${issue.priority}`);
+		if (issue.labels) labels.push(...issue.labels);
 		if (labels.length > 0) {
 			args.push("--label", labels.join(","));
 		}
