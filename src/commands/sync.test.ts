@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { mkdirSync, realpathSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -131,5 +131,172 @@ describe("sync — worktree guard", () => {
 		}
 
 		expect(logs.some((l) => l.includes("Committed"))).toBe(true);
+	});
+});
+
+describe("sync — push", () => {
+	test("push-short-circuit-no-github", async () => {
+		const root = join(tmpDir, "repo");
+		mkdirSync(root);
+		git(["init"], root);
+		git(["config", "user.email", "test@test.com"], root);
+		git(["config", "user.name", "Test"], root);
+		initSeedsDir(root);
+		writeFileSync(
+			join(root, ".suji", "issues.jsonl"),
+			'{"id":"test-0001","title":"Open issue","status":"open","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}\n',
+		);
+		git(["add", "."], root);
+		git(["commit", "-m", "init"], root);
+
+		const logs: string[] = [];
+		const origLog = console.log;
+		console.log = (...args: unknown[]) => {
+			logs.push(args.map(String).join(" "));
+		};
+
+		const origCwd = process.cwd();
+		process.chdir(root);
+		try {
+			await run(["--push", "--json"]);
+		} finally {
+			process.chdir(origCwd);
+			console.log = origLog;
+		}
+
+		const output = JSON.parse(logs.join(""));
+		expect(output.success).toBe(true);
+		expect(Object.hasOwn(output, "pushed")).toBe(false);
+		expect(logs.some((l) => l.includes("Pushed:"))).toBe(false);
+	});
+
+	test("push-dry-run-lists-candidates", async () => {
+		const root = join(tmpDir, "repo");
+		mkdirSync(root);
+		git(["init"], root);
+		git(["config", "user.email", "test@test.com"], root);
+		git(["config", "user.name", "Test"], root);
+		initSeedsDir(root);
+		writeFileSync(
+			join(root, ".suji", "config.yaml"),
+			'github_enabled: true\ngithub_repo: "test/repo"\nproject: "test"\nversion: "1"\n',
+		);
+		const issuesPath = join(root, ".suji", "issues.jsonl");
+		const issueLines =
+			[
+				'{"id":"test-0001","title":"Candidate One","status":"open","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+				'{"id":"test-0002","title":"Candidate Two","status":"open","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+				'{"id":"test-0003","title":"Linked Issue","status":"open","type":"task","priority":2,"githubNumber":42,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+				'{"id":"test-0004","title":"Closed Issue","status":"closed","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+			].join("\n") + "\n";
+		writeFileSync(issuesPath, issueLines);
+		git(["add", "."], root);
+		git(["commit", "-m", "init"], root);
+
+		const logs: string[] = [];
+		const origLog = console.log;
+		console.log = (...args: unknown[]) => {
+			logs.push(args.map(String).join(" "));
+		};
+
+		const origCwd = process.cwd();
+		process.chdir(root);
+		try {
+			await run(["--push", "--dry-run"]);
+		} finally {
+			process.chdir(origCwd);
+			console.log = origLog;
+		}
+
+		expect(readFileSync(issuesPath, "utf8")).toBe(issueLines);
+		const wouldPushLogs = logs.filter((l) => l.includes("Would push:"));
+		expect(wouldPushLogs.some((l) => l.includes("test-0001"))).toBe(true);
+		expect(wouldPushLogs.some((l) => l.includes("test-0002"))).toBe(true);
+		expect(wouldPushLogs.some((l) => l.includes("test-0003"))).toBe(false);
+		expect(wouldPushLogs.some((l) => l.includes("test-0004"))).toBe(false);
+	});
+
+	test("push-status-no-mutate", async () => {
+		const root = join(tmpDir, "repo");
+		mkdirSync(root);
+		git(["init"], root);
+		git(["config", "user.email", "test@test.com"], root);
+		git(["config", "user.name", "Test"], root);
+		initSeedsDir(root);
+		writeFileSync(
+			join(root, ".suji", "config.yaml"),
+			'github_enabled: true\ngithub_repo: "test/repo"\nproject: "test"\nversion: "1"\n',
+		);
+		const issuesPath = join(root, ".suji", "issues.jsonl");
+		writeFileSync(
+			issuesPath,
+			[
+				'{"id":"test-0001","title":"Candidate One","status":"open","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+				'{"id":"test-0002","title":"Candidate Two","status":"open","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+				'{"id":"test-0003","title":"Linked Issue","status":"open","type":"task","priority":2,"githubNumber":42,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+				'{"id":"test-0004","title":"Closed Issue","status":"closed","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}',
+			].join("\n") + "\n",
+		);
+		git(["add", "."], root);
+		git(["commit", "-m", "init"], root);
+
+		const logs: string[] = [];
+		const origLog = console.log;
+		console.log = (...args: unknown[]) => {
+			logs.push(args.map(String).join(" "));
+		};
+
+		const origCwd = process.cwd();
+		process.chdir(root);
+		try {
+			await run(["--push", "--status"]);
+		} finally {
+			process.chdir(origCwd);
+			console.log = origLog;
+		}
+
+		expect(logs.some((l) => l.includes("Would push:") && l.includes("test-0001"))).toBe(true);
+		expect(logs.some((l) => l.includes("Would push:") && l.includes("test-0002"))).toBe(true);
+		expect(
+			logs.some(
+				(l) =>
+					l.includes("No uncommitted .suji/ changes") || l.includes("Uncommitted .suji/ changes"),
+			),
+		).toBe(true);
+	});
+
+	test("regular-sync-unchanged", async () => {
+		const root = join(tmpDir, "repo");
+		mkdirSync(root);
+		git(["init"], root);
+		git(["config", "user.email", "test@test.com"], root);
+		git(["config", "user.name", "Test"], root);
+		initSeedsDir(root);
+		git(["add", "."], root);
+		git(["commit", "-m", "init"], root);
+
+		writeFileSync(
+			join(root, ".suji", "issues.jsonl"),
+			'{"id":"test-0001","title":"Test","status":"open","type":"task","priority":2,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}\n',
+		);
+
+		const logs: string[] = [];
+		const origLog = console.log;
+		console.log = (...args: unknown[]) => {
+			logs.push(args.map(String).join(" "));
+		};
+
+		const origCwd = process.cwd();
+		process.chdir(root);
+		try {
+			await run([]);
+		} finally {
+			process.chdir(origCwd);
+			console.log = origLog;
+		}
+
+		expect(logs.some((l) => l.includes("Committed"))).toBe(true);
+		expect(logs.some((l) => l.includes("Pushed:"))).toBe(false);
+		expect(logs.some((l) => l.includes("Would push:"))).toBe(false);
 	});
 });

@@ -84,7 +84,9 @@ Every command supports `--json` for structured output. Global flags: `-v`/`--ver
 | `su label list <id>` | List labels on an issue |
 | `su label list-all` | List all labels across issues |
 | `su stats` | Project statistics |
-| `su sync` | Stage and commit `.suji/` changes (`--status`, `--dry-run`) |
+| `su sync` | Stage and commit `.suji/` changes (`--status`, `--dry-run`, `--push`) |
+
+`su sync --push` pushes open local-only issues (no `githubNumber`) to GitHub, writes back the assigned GitHub issue number, then stages and commits all changes in one pass. `--push --dry-run` lists candidates without acting; `--push --status` is also read-only. Exit code is 1 if any push fails. With `--json`, the output includes `pushed`, `pushFailed`, and `pushOrphaned` counts when the push pass ran. In dry-run mode, `pushed` reflects the number of candidates that would be pushed.
 
 ### Template Commands
 

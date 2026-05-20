@@ -53,5 +53,15 @@
 		"status": "active",
 		"createdAt": "2026-03-07T14:32:16.493Z",
 		"completedAt": null
+	},
+	{
+		"id": "group-7f6d4633",
+		"name": "suji-sync-push-batch",
+		"memberIssueIds": [
+			"suji-a52b"
+		],
+		"status": "active",
+		"createdAt": "2026-05-17T12:10:48.511Z",
+		"completedAt": null
 	}
 ]

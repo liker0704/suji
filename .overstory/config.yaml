@@ -20,12 +20,12 @@ agents:
   baseDir: .overstory/agent-defs
   maxConcurrent: 25
   staggerDelayMs: 2000
-  maxDepth: 2
+  maxDepth: 3
   maxSessionsPerRun: 0
 worktrees:
   baseDir: .overstory/worktrees
 taskTracker:
-  backend: auto
+  backend: seeds
   enabled: true
 mulch:
   enabled: true

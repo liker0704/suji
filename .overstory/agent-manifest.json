@@ -135,26 +135,6 @@
 				"no-worktree"
 			]
 		},
-		"coordinator-mission-assess": {
-			"file": "coordinator-mission-assess.md",
-			"model": "opus",
-			"tools": [
-				"Read",
-				"Glob",
-				"Grep",
-				"Bash"
-			],
-			"capabilities": [
-				"coordinate",
-				"assess",
-				"mission"
-			],
-			"canSpawn": false,
-			"constraints": [
-				"read-only",
-				"no-worktree"
-			]
-		},
 		"coordinator-mission-direct": {
 			"file": "coordinator-mission-direct.md",
 			"model": "opus",
@@ -552,6 +532,105 @@
 				"read-only",
 				"no-worktree"
 			]
+		},
+		"mission-analyst-intake": {
+			"file": "mission-analyst-intake.md",
+			"model": "opus",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"research",
+				"analyze",
+				"synthesize",
+				"mission",
+				"intake"
+			],
+			"canSpawn": true,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"product-clarifier": {
+			"file": "product-clarifier.md",
+			"model": "haiku",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"clarify",
+				"spec-author",
+				"intake"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"tier-classifier": {
+			"file": "tier-classifier.md",
+			"model": "haiku",
+			"tools": [
+				"Read",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"classify",
+				"tier-classify",
+				"intake"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"no-worktree"
+			]
+		},
+		"debugger": {
+			"file": "debugger.md",
+			"model": "sonnet",
+			"tools": [
+				"Read",
+				"Write",
+				"Edit",
+				"Glob",
+				"Grep",
+				"Bash"
+			],
+			"capabilities": [
+				"debug",
+				"fix",
+				"diagnose"
+			],
+			"canSpawn": false,
+			"constraints": []
+		},
+		"pr-comment-triage": {
+			"file": "pr-comment-triage.md",
+			"model": "haiku",
+			"tools": [
+				"Read"
+			],
+			"capabilities": [
+				"pr-comment-triage"
+			],
+			"canSpawn": false,
+			"constraints": [
+				"read-only",
+				"ephemeral",
+				"single-pass",
+				"no-write",
+				"no-bash"
+			]
 		}
 	},
 	"capabilityIndex": {
@@ -561,7 +640,8 @@
 		"research": [
 			"scout",
 			"mission-analyst",
-			"mission-analyst-planned"
+			"mission-analyst-planned",
+			"mission-analyst-intake"
 		],
 		"implement": [
 			"builder",
@@ -572,7 +652,8 @@
 			"builder"
 		],
 		"fix": [
-			"builder"
+			"builder",
+			"debugger"
 		],
 		"review": [
 			"reviewer",
@@ -594,7 +675,6 @@
 			"lead",
 			"coordinator",
 			"coordinator-mission",
-			"coordinator-mission-assess",
 			"coordinator-mission-direct",
 			"coordinator-mission-planned",
 			"execution-director",
@@ -623,23 +703,22 @@
 		],
 		"mission": [
 			"coordinator-mission",
-			"coordinator-mission-assess",
 			"coordinator-mission-direct",
 			"coordinator-mission-planned",
 			"mission-analyst",
 			"mission-analyst-planned",
-			"execution-director"
-		],
-		"assess": [
-			"coordinator-mission-assess"
+			"execution-director",
+			"mission-analyst-intake"
 		],
 		"analyze": [
 			"mission-analyst",
-			"mission-analyst-planned"
+			"mission-analyst-planned",
+			"mission-analyst-intake"
 		],
 		"synthesize": [
 			"mission-analyst",
-			"mission-analyst-planned"
+			"mission-analyst-planned",
+			"mission-analyst-intake"
 		],
 		"execute": [
 			"execution-director"
@@ -708,6 +787,32 @@
 		],
 		"knowledge-extraction": [
 			"architecture-sync"
+		],
+		"intake": [
+			"mission-analyst-intake",
+			"product-clarifier",
+			"tier-classifier"
+		],
+		"clarify": [
+			"product-clarifier"
+		],
+		"spec-author": [
+			"product-clarifier"
+		],
+		"classify": [
+			"tier-classifier"
+		],
+		"tier-classify": [
+			"tier-classifier"
+		],
+		"debug": [
+			"debugger"
+		],
+		"diagnose": [
+			"debugger"
+		],
+		"pr-comment-triage": [
+			"pr-comment-triage"
 		]
 	}
 }
