@@ -125,26 +125,67 @@ export async function ghCreate(
 
 		const body = bodyParts.join("\n");
 
-		const args = ["gh", "issue", "create", "--repo", repo, "--title", issue.title, "--body", body];
+		const baseArgs = [
+			"gh",
+			"issue",
+			"create",
+			"--repo",
+			repo,
+			"--title",
+			issue.title,
+			"--body",
+			body,
+		];
 
 		// Add labels if they exist (created by sd init --github)
 		const labels: string[] = [];
 		if (issue.type) labels.push(`type:${issue.type}`);
 		if (issue.priority !== undefined) labels.push(`priority:${issue.priority}`);
 		if (issue.labels) labels.push(...issue.labels);
-		if (labels.length > 0) {
-			args.push("--label", labels.join(","));
-		}
 
-		const proc = Bun.spawn(args, { stdout: "pipe", stderr: "pipe" });
-		const output = await new Response(proc.stdout).text();
-		const code = await proc.exited;
+		// Bug fix haru-2eff: if any label isn't registered on the GitHub repo,
+		// `gh issue create --label X,Y,Z` aborts with "could not add label: X
+		// not found". Parse the stderr, drop the missing labels, and retry once
+		// without them so the issue still pushes. Operators can backfill the
+		// missing labels later via `gh label create`.
+		const tryCreate = async (
+			currentLabels: string[],
+		): Promise<{
+			number: number | null;
+			missingLabels: string[];
+		}> => {
+			const args = [...baseArgs];
+			if (currentLabels.length > 0) args.push("--label", currentLabels.join(","));
+			const proc = Bun.spawn(args, { stdout: "pipe", stderr: "pipe" });
+			const [stdout, stderr] = await Promise.all([
+				new Response(proc.stdout).text(),
+				new Response(proc.stderr).text(),
+			]);
+			const code = await proc.exited;
+			if (code === 0) {
+				const match = stdout.trim().match(/\/issues\/(\d+)/);
+				return { number: match?.[1] ? Number(match[1]) : null, missingLabels: [] };
+			}
+			const missing: string[] = [];
+			for (const m of stderr.matchAll(
+				/could not add label:\s*['"]?([^'"\n]+?)['"]?\s+not found/gi,
+			)) {
+				if (m[1]) missing.push(m[1].trim());
+			}
+			return { number: null, missingLabels: missing };
+		};
 
-		if (code !== 0) return null;
+		const first = await tryCreate(labels);
+		if (first.number !== null) return first.number;
+		if (first.missingLabels.length === 0) return null; // failure unrelated to labels
 
-		// gh issue create returns URL like https://github.com/owner/repo/issues/123
-		const match = output.trim().match(/\/issues\/(\d+)/);
-		return match ? Number(match[1]) : null;
+		const filtered = labels.filter((l) => !first.missingLabels.includes(l));
+		if (filtered.length === labels.length) return null; // no actual change, give up
+		console.warn(
+			`[suji] dropped unknown GitHub labels: ${first.missingLabels.join(", ")} — issue still pushed`,
+		);
+		const retry = await tryCreate(filtered);
+		return retry.number;
 	} catch {
 		return null;
 	}
