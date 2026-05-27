@@ -1,14 +1,11 @@
 # Suji
 
-Forked from jayminwest/seeds under MIT License.
+> 筋 — thread. Git-native issue tracker for AI agent workflows.
 
-Git-native issue tracker for AI agent workflows.
-
-[![npm](https://img.shields.io/npm/v/@hana/suji-cli)](https://www.npmjs.com/package/@hana/suji-cli)
-[![CI](https://github.com/jayminwest/seeds/actions/workflows/ci.yml/badge.svg)](https://github.com/jayminwest/seeds/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Replaces [beads](https://github.com/steveyegge/beads) in the [overstory](https://github.com/jayminwest/overstory)/[mulch](https://github.com/jayminwest/mulch) ecosystem. No Dolt, no daemon, no binary DB files. **The JSONL file IS the database.**
+JSONL storage, Bun runtime, zero binary databases. **The JSONL file IS the
+database** — no Dolt, no daemon, no export pipeline.
 
 ## Install
 
@@ -16,26 +13,17 @@ Replaces [beads](https://github.com/steveyegge/beads) in the [overstory](https:/
 bun install -g @hana/suji-cli
 ```
 
-Or try without installing:
-
-```bash
-npx @hana/suji-cli --help
-```
-
 ### Development
 
 ```bash
-git clone https://github.com/jayminwest/seeds
+git clone https://github.com/liker0704/suji
 cd suji
 bun install
-bun link              # Makes 'su' available globally
-
-bun test              # Run all tests
-bun run lint          # Biome check
-bun run typecheck     # tsc --noEmit
+bun link
+bun test
 ```
 
-## Quick Start
+## Quick start
 
 ```bash
 # Initialize in your project
@@ -60,9 +48,11 @@ su sync
 
 ## Commands
 
-Every command supports `--json` for structured output. Global flags: `-v`/`--version`, `-q`/`--quiet`, `--verbose`, `--timing`. ANSI colors respect `NO_COLOR`.
+Every command supports `--json` for structured output. Global flags:
+`-v`/`--version`, `-q`/`--quiet`, `--verbose`, `--timing`. ANSI colors respect
+`NO_COLOR`.
 
-### Issue Commands
+### Issues
 
 | Command | Description |
 |---------|-------------|
@@ -71,44 +61,37 @@ Every command supports `--json` for structured output. Global flags: `-v`/`--ver
 | `su show <id>` | Show issue details |
 | `su list` | List issues with filters (`--status`, `--type`, `--assignee`, `--label`, `--limit`, `--all`) |
 | `su ready` | Open issues with no unresolved blockers |
-| `su update <id>` | Update issue fields (`--status`, `--title`, `--priority`, `--assignee`, `--description`) |
+| `su update <id>` | Update issue fields |
 | `su close <id> [<id2> ...]` | Close one or more issues (`--reason`) |
-| `su dep add <issue> <depends-on>` | Add dependency |
-| `su dep remove <issue> <depends-on>` | Remove dependency |
-| `su dep list <issue>` | Show deps for an issue |
-| `su block <id> --by <blocker-id>` | Mark issue as blocked by another |
-| `su unblock <id> --from <blocker-id>` | Remove a blocker (`--all` to clear all) |
+| `su dep add\|remove\|list <issue> <depends-on>` | Manage dependencies |
+| `su block <id> --by <blocker-id>` | Mark issue as blocked |
+| `su unblock <id> --from <blocker-id>` | Remove a blocker (`--all` to clear) |
 | `su blocked` | Show all blocked issues |
-| `su label add <id> <label>` | Add a label to an issue |
-| `su label remove <id> <label>` | Remove a label from an issue |
-| `su label list <id>` | List labels on an issue |
+| `su label add\|remove\|list <id> <label>` | Manage labels |
 | `su label list-all` | List all labels across issues |
 | `su stats` | Project statistics |
 | `su sync` | Stage and commit `.suji/` changes (`--status`, `--dry-run`, `--push`) |
 
-`su sync --push` pushes open local-only issues (no `githubNumber`) to GitHub, writes back the assigned GitHub issue number, then stages and commits all changes in one pass. `--push --dry-run` lists candidates without acting; `--push --status` is also read-only. Exit code is 1 if any push fails. With `--json`, the output includes `pushed`, `pushFailed`, and `pushOrphaned` counts when the push pass ran. In dry-run mode, `pushed` reflects the number of candidates that would be pushed.
+`su sync --push` pushes open local-only issues (no `githubNumber`) to GitHub,
+writes back the assigned issue number, then stages and commits everything in
+one pass. `--push --dry-run` lists candidates without acting.
 
-### Template Commands
+### Templates
 
 | Command | Description |
 |---------|-------------|
 | `su tpl create --name <text>` | Create a template |
-| `su tpl step add <id> --title <text>` | Add step (supports `{prefix}` interpolation) |
-| `su tpl list` | List all templates |
+| `su tpl step add <id> --title <text>` | Add a step (supports `{prefix}` interpolation) |
+| `su tpl list` | List templates |
 | `su tpl show <id>` | Show template with steps |
 | `su tpl pour <id> --prefix <text>` | Instantiate template into issues |
 | `su tpl status <id>` | Show convoy completion status |
 
-### Health
+### Health & agent integration
 
 | Command | Description |
 |---------|-------------|
 | `su doctor` | Check project health and data integrity (`--fix`) |
-
-### Agent Integration
-
-| Command | Description |
-|---------|-------------|
 | `su prime` | Output AI agent context (`--compact`) |
 | `su onboard` | Add suji section to CLAUDE.md / AGENTS.md |
 
@@ -122,20 +105,28 @@ Every command supports `--json` for structured output. Global flags: `-v`/`--ver
 
 ## Architecture
 
-Suji stores all data in JSONL files inside a `.suji/` directory — one JSON object per line, fully diffable and mergeable via git. Advisory file locks (`O_CREAT | O_EXCL`) and atomic writes (temp file + rename) ensure safe concurrent access from multiple agents. The `merge=union` gitattribute handles parallel branch merges; dedup-on-read (last occurrence wins) resolves any duplicates. See [CLAUDE.md](CLAUDE.md) for full technical details.
+Suji stores all data in JSONL files inside a `.suji/` directory — one JSON
+object per line, fully diffable and mergeable via git. Advisory file locks
+(`O_CREAT | O_EXCL`) and atomic writes (temp file + rename) ensure safe
+concurrent access from multiple agents. The `merge=union` gitattribute handles
+parallel branch merges; dedup-on-read (last occurrence wins) resolves any
+duplicates.
 
-## Why
+See [CLAUDE.md](CLAUDE.md) for full technical details.
 
-Beads works but carries baggage overstory doesn't need:
+## Why not beads
+
+[Beads](https://github.com/steveyegge/beads) works, but for agent workflows it
+carries baggage:
 
 | Problem | Beads | Suji |
-|---------|-------|-------|
+|---------|-------|------|
 | Storage | 2.8MB binary `beads.db` (can't diff/merge) | JSONL (diffable, mergeable) |
 | Sync | 286 export-state tracking files | No sync — file IS the DB |
 | Concurrency | `beads.db` lock contention | Advisory locks + atomic writes |
 | Dependencies | Dolt embedded | chalk + commander |
 
-## Priority Scale
+## Priority scale
 
 | Value | Label    | Use |
 |-------|----------|-----|
@@ -145,7 +136,7 @@ Beads works but carries baggage overstory doesn't need:
 | 3     | Low      | Nice-to-have |
 | 4     | Backlog  | Future consideration |
 
-## On-Disk Format
+## On-disk format
 
 ```
 .suji/
@@ -158,13 +149,14 @@ Beads works but carries baggage overstory doesn't need:
 Add to your `.gitattributes` (done automatically by `su init`):
 
 ```
-.suji/issues.jsonl merge=union
+.suji/issues.jsonl    merge=union
 .suji/templates.jsonl merge=union
 ```
 
-The `merge=union` strategy handles parallel agent branch merges. Suji deduplicates by ID on read (last occurrence wins), so conflicts resolve automatically.
+`merge=union` handles parallel agent branch merges. Suji deduplicates by ID on
+read (last occurrence wins), so conflicts resolve automatically.
 
-## JSON Output
+## JSON output
 
 Success:
 ```json
@@ -180,34 +172,44 @@ Error:
 
 Suji is safe for concurrent multi-agent use:
 
-- **Advisory file locks** — `O_CREAT | O_EXCL`, 30s stale threshold, 100ms retry with jitter, 30s timeout
+- **Advisory file locks** — `O_CREAT | O_EXCL`, 30s stale threshold, 100ms
+  retry with jitter, 30s timeout
 - **Atomic writes** — temp file + rename under lock
 - **Dedup on read** — last occurrence wins after `merge=union` git merges
 
-## Integration with Overstory
+## Integration with Haru
 
-Overstory wraps `su` via `Bun.spawn(["su", ...])` with `--json` parsing, identical to how it wraps `bd`:
+Haru wraps `su` via `Bun.spawn(["su", ...])` with `--json` parsing:
 
-| BeadsClient method | su command |
-|--------------------|------------|
+| Method | Suji command |
+|--------|--------------|
 | `ready()` | `su ready --json` |
 | `show(id)` | `su show <id> --json` |
 | `create(title, opts)` | `su create --title "..." --json` |
 | `claim(id)` | `su update <id> --status=in_progress --json` |
 | `close(id, reason)` | `su close <id> --reason "..." --json` |
 
-## Part of os-eco
+## Part of Hana
 
-Suji is part of the [os-eco](https://github.com/jayminwest/os-eco) AI agent tooling ecosystem.
+Suji is part of the [Hana](https://github.com/liker0704/hana) ecosystem:
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/jayminwest/os-eco/main/branding/logo.png" alt="os-eco" width="444" />
-</p>
+- [Haru](https://github.com/liker0704/haru) — orchestration
+- [Kura](https://github.com/liker0704/kura) — structured expertise
+- [Suji](https://github.com/liker0704/suji) — issue tracking
+- [Tane](https://github.com/liker0704/tane) — prompt management
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
 MIT
+
+---
+
+Maintained by [Kyryl Zmiienko](https://www.linkedin.com/in/kyryl-zmiienko/).
+
+Part of a personal ecosystem alongside [Haru](https://github.com/liker0704/haru),
+[Kura](https://github.com/liker0704/kura), and
+[Tane](https://github.com/liker0704/tane). Diverged significantly from upstream.
