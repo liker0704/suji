@@ -4,8 +4,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-JSONL storage, Bun runtime, zero binary databases. **The JSONL file IS the
-database** — no Dolt, no daemon, no export pipeline.
+Coding agents file and track work as they go — ready queues, blockers,
+templates, sync to GitHub. Suji stores it all as JSONL inside `.suji/`, so
+every issue is diffable, mergeable, and lives in the same git history as the
+code. **The JSONL file IS the database** — no Dolt, no daemon, no export
+pipeline.
 
 ## Install
 
